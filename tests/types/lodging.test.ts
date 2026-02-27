@@ -154,12 +154,12 @@ describe("AccommodationSchema", () => {
 
 describe("BedDetailsSchema", () => {
   it("sets @type = BedDetails", () => {
-    const bed = BedDetailsSchema.parse({ numberOfBeds: 1, typeOfBed: "Double bed" });
+    const bed = BedDetailsSchema.parse({ numberOfBeds: 1, typeOfBed: "Queen" });
     expect(bed["@type"]).toBe("BedDetails");
   });
 
   it("accepts all BedTypeEnum values", () => {
-    const validTypes = ["Single bed", "Double bed", "Bunk bed", "Queen bed", "King bed", "Sofa bed", "Cot", "Waterbed", "Toddler bed"];
+    const validTypes = ["CaliforniaKing", "King", "Queen", "Full", "Double", "SemiDouble", "Single"];
     for (const t of validTypes) {
       expect(() => BedTypeEnum.parse(t)).not.toThrow();
     }
@@ -168,5 +168,48 @@ describe("BedDetailsSchema", () => {
   it("accepts custom bed type string", () => {
     const bed = BedDetailsSchema.parse({ typeOfBed: "Murphy bed" });
     expect(bed.typeOfBed).toBe("Murphy bed");
+  });
+});
+
+// ─── VacationRental (new fields) ──────────────────────────────────────────────
+
+describe("createVacationRental (new fields)", () => {
+  it("accepts brand as string", () => {
+    const rental = createVacationRental({ name: "Cozy Cabin", brand: "Cabin Escapes" });
+    expect(rental.toObject().brand).toBe("Cabin Escapes");
+  });
+
+  it("accepts brand as Brand object", () => {
+    const rental = createVacationRental({
+      name: "Cozy Cabin",
+      brand: { "@type": "Brand", name: "Cabin Escapes" },
+    });
+    expect((rental.toObject().brand as any)?.name).toBe("Cabin Escapes");
+  });
+
+  it("accepts knowsLanguage as string", () => {
+    const rental = createVacationRental({ name: "Paris Flat", knowsLanguage: "fr" });
+    expect(rental.toObject().knowsLanguage).toBe("fr");
+  });
+
+  it("accepts knowsLanguage as array", () => {
+    const rental = createVacationRental({ name: "Paris Flat", knowsLanguage: ["fr", "en"] });
+    expect(rental.toObject().knowsLanguage).toEqual(["fr", "en"]);
+  });
+
+  it("accepts additionalType on VacationRental", () => {
+    const rental = createVacationRental({ name: "Studio", additionalType: "EntirePlace" });
+    expect(rental.toObject().additionalType).toBe("EntirePlace");
+  });
+});
+
+// ─── AccommodationSchema (additionalType) ─────────────────────────────────────
+
+describe("AccommodationSchema (additionalType)", () => {
+  it("accepts additionalType PrivateRoom", () => {
+    const acc = AccommodationSchema.parse({
+      additionalType: "PrivateRoom",
+    });
+    expect(acc.additionalType).toBe("PrivateRoom");
   });
 });

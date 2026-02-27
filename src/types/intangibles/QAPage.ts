@@ -3,6 +3,27 @@ import { makeFactory } from "../../core/base";
 import { WebPageSchema } from "../creative-works/WebPage";
 import { CreativeWorkSchema } from "../creative-works/CreativeWork";
 import { PersonOrOrgRef } from "../shared/PersonOrOrgRef";
+import { ImageOrUrl } from "../shared/ImageObject";
+import { VideoObjectSchema } from "../shared/VideoObject";
+
+// ─── AlignmentObject ─────────────────────────────────────────────────────────
+
+/**
+ * schema.org/AlignmentObject
+ * Links educational content to a framework/standard (e.g. Common Core, CCSS).
+ */
+export const AlignmentObjectSchema = z.object({
+  "@type": z.literal("AlignmentObject").default("AlignmentObject"),
+  alignmentType: z.string(),
+  targetName: z.string(),
+  educationalFramework: z.string().optional(),
+  targetUrl: z.string().url().optional(),
+  targetDescription: z.string().optional(),
+});
+
+export type AlignmentObject = z.infer<typeof AlignmentObjectSchema>;
+
+// ─── Answer ──────────────────────────────────────────────────────────────────
 
 /**
  * schema.org/Answer
@@ -13,10 +34,21 @@ export const AnswerSchema = z.object({
   "@type": z.literal("Answer").default("Answer"),
   text: z.string(),
   dateCreated: z.string().optional(),            // ISO 8601
+  dateModified: z.string().optional(),           // ISO 8601
   upvoteCount: z.number().int().nonnegative().optional(),
-  url: z.url().optional(),
+  url: z.string().url().optional(),
   author: PersonOrOrgRef.optional(),
+  image: z.union([ImageOrUrl, z.array(ImageOrUrl)]).optional(),
+  video: z.union([VideoObjectSchema, z.array(VideoObjectSchema)]).optional(),
+  comment: z.array(z.object({
+    "@type": z.literal("Comment").default("Comment"),
+    text: z.string(),
+    author: PersonOrOrgRef.optional(),
+    datePublished: z.string().optional(),
+  })).optional(),
 });
+
+// ─── Question ────────────────────────────────────────────────────────────────
 
 /**
  * schema.org/Question
@@ -33,8 +65,15 @@ export const QuestionSchema = z.object({
   author: PersonOrOrgRef.optional(),
   dateCreated: z.string().optional(),
   datePublished: z.string().optional(),
-  url: z.url().optional(),
+  dateModified: z.string().optional(),           // ISO 8601
+  url: z.string().url().optional(),
+  image: z.union([ImageOrUrl, z.array(ImageOrUrl)]).optional(),
+  video: z.union([VideoObjectSchema, z.array(VideoObjectSchema)]).optional(),
+  /** Education Q&A question type, e.g. "Flashcard", "Problem Set" */
+  eduQuestionType: z.string().optional(),
 });
+
+// ─── FAQPage ─────────────────────────────────────────────────────────────────
 
 /**
  * schema.org/FAQPage
@@ -46,6 +85,8 @@ export const FAQPageSchema = WebPageSchema.extend({
   mainEntity: z.array(QuestionSchema),
 });
 
+// ─── QAPage ──────────────────────────────────────────────────────────────────
+
 /**
  * schema.org/QAPage
  * Community Q&A page. mainEntity is a single Question.
@@ -54,6 +95,8 @@ export const QAPageSchema = WebPageSchema.extend({
   "@type": z.literal("QAPage").default("QAPage"),
   mainEntity: QuestionSchema,
 });
+
+// ─── Quiz ────────────────────────────────────────────────────────────────────
 
 /**
  * schema.org/Quiz
@@ -67,12 +110,9 @@ export const QuizSchema = CreativeWorkSchema.extend({
     z.object({ "@type": z.string() }).catchall(z.unknown())
   ).optional(),
   hasPart: z.array(QuestionSchema).optional(),
-  educationalAlignment: z.object({
-    "@type": z.literal("AlignmentObject").default("AlignmentObject"),
-    alignmentType: z.string().optional(),
-    targetName: z.string().optional(),
-    targetUrl: z.url().optional(),
-  }).optional(),
+  educationalAlignment: z
+    .union([AlignmentObjectSchema, z.array(AlignmentObjectSchema)])
+    .optional(),
 });
 
 export type Answer = z.infer<typeof AnswerSchema>;

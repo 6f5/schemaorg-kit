@@ -56,12 +56,17 @@ export {
 
 export {
   ItemAvailability,
+  ItemCondition,
   OfferSchema,
   AggregateOfferSchema,
   MerchantReturnPolicySchema,
+  UnitPriceSpecificationSchema,
+  MerchantReturnPolicySeasonalOverrideSchema,
   type Offer,
   type AggregateOffer,
   type MerchantReturnPolicy,
+  type UnitPriceSpecification,
+  type MerchantReturnPolicySeasonalOverride,
   createOffer,
 } from "./types/shared/Offer";
 
@@ -90,12 +95,35 @@ export {
 export {
   ClipSchema,
   BroadcastEventSchema,
+  SeekToActionSchema,
   VideoObjectSchema,
   type Clip,
   type BroadcastEvent,
+  type SeekToAction,
   type VideoObject,
   createVideoObject,
 } from "./types/shared/VideoObject";
+
+export {
+  InteractionCounterSchema,
+  type InteractionCounter,
+} from "./types/shared/InteractionCounter";
+
+export {
+  MemberProgramTierSchema,
+  MemberProgramSchema,
+  type MemberProgramTier,
+  type MemberProgram,
+} from "./types/shared/MemberProgram";
+
+export {
+  ServicePeriodSchema,
+  ShippingConditionsSchema,
+  ShippingServiceSchema,
+  type ServicePeriod,
+  type ShippingConditions,
+  type ShippingService,
+} from "./types/shared/ShippingService";
 
 // ============================================================
 //   Things
@@ -127,10 +155,14 @@ export {
   ProductGroupSchema,
   CertificationSchema,
   ThreeDModelSchema,
+  SizeSpecificationSchema,
+  PeopleAudienceSchema,
   type Product,
   type ProductGroup,
   type Certification,
   type ThreeDModel,
+  type SizeSpecification,
+  type PeopleAudience,
   createProduct,
   createProductGroup,
 } from "./types/things/Product";
@@ -249,6 +281,14 @@ export {
   createMathSolver,
 } from "./types/creative-works/MathSolver";
 
+export {
+  ClaimSchema,
+  ClaimReviewSchema,
+  type Claim,
+  type ClaimReview,
+  createClaimReview,
+} from "./types/creative-works/ClaimReview";
+
 // ============================================================
 //   Intangibles
 // ============================================================
@@ -273,11 +313,13 @@ export {
 } from "./types/intangibles/ItemList";
 
 export {
+  AlignmentObjectSchema,
   AnswerSchema,
   QuestionSchema,
   FAQPageSchema,
   QAPageSchema,
   QuizSchema,
+  type AlignmentObject,
   type Answer,
   type Question,
   type FAQPage,

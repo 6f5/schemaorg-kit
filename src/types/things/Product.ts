@@ -53,6 +53,31 @@ const LooseProductGroupRef = z.lazy(() =>
   z.object({ "@type": z.string() }).catchall(z.unknown())
 );
 
+// ─── SizeSpecification ───────────────────────────────────────────────────────
+
+export const SizeSpecificationSchema = z.object({
+  "@type": z.literal("SizeSpecification").default("SizeSpecification"),
+  name: z.string().optional(),
+  /** Size system, e.g. "US", "EU", "UK", "JP" */
+  sizeSystem: z.string().optional(),
+  /** Size group, e.g. "Petite", "Plus", "Maternity", "Regular", "Tall" */
+  sizeGroup: z.union([z.string(), z.array(z.string())]).optional(),
+});
+
+export type SizeSpecification = z.infer<typeof SizeSpecificationSchema>;
+
+// ─── PeopleAudience ──────────────────────────────────────────────────────────
+
+export const PeopleAudienceSchema = z.object({
+  "@type": z.literal("PeopleAudience").default("PeopleAudience"),
+  /** "Male", "Female", "Unknown" */
+  suggestedGender: z.string().optional(),
+  suggestedMinAge: z.number().optional(),
+  suggestedMaxAge: z.number().optional(),
+});
+
+export type PeopleAudience = z.infer<typeof PeopleAudienceSchema>;
+
 export const ProductSchema = extendThing("Product", {
   sku: z.string().optional(),
   // GTIN identifiers (Google Product requirement):
@@ -91,6 +116,40 @@ export const ProductSchema = extendThing("Product", {
   hasCertification: z.union([CertificationSchema, z.array(CertificationSchema)]).optional(),
   /** 3D models for interactive product views in Google Search/Images */
   subjectOf: z.union([ThreeDModelSchema, z.array(ThreeDModelSchema)]).optional(),
+  /** Pattern design, e.g. "Polka dots", "Stripes" */
+  pattern: z.string().optional(),
+  /** Size as a string or structured SizeSpecification */
+  size: z.union([z.string(), SizeSpecificationSchema]).optional(),
+  /** Target audience (gender, age range) */
+  audience: PeopleAudienceSchema.optional(),
+  /** Positive aspects as an ItemList */
+  positiveNotes: z
+    .object({
+      "@type": z.literal("ItemList").default("ItemList"),
+      itemListElement: z.array(
+        z.object({
+          "@type": z.literal("ListItem").default("ListItem"),
+          position: z.number().int().positive(),
+          name: z.string(),
+        })
+      ),
+    })
+    .optional(),
+  /** Negative aspects as an ItemList */
+  negativeNotes: z
+    .object({
+      "@type": z.literal("ItemList").default("ItemList"),
+      itemListElement: z.array(
+        z.object({
+          "@type": z.literal("ListItem").default("ListItem"),
+          position: z.number().int().positive(),
+          name: z.string(),
+        })
+      ),
+    })
+    .optional(),
+  /** ID of the ProductGroup this variant belongs to */
+  inProductGroupWithID: z.string().optional(),
 });
 
 /**
@@ -112,6 +171,8 @@ export const ProductGroupSchema = extendThing("ProductGroup", {
   ]).optional(),
   offers: z.union([OfferSchema, z.array(OfferSchema)]).optional(),
   aggregateRating: AggregateRatingSchema.optional(),
+  review: z.union([ReviewSchema, z.array(ReviewSchema)]).optional(),
+  audience: PeopleAudienceSchema.optional(),
   image: z.union([ImageOrUrl, z.array(ImageOrUrl)]).optional(),
 });
 

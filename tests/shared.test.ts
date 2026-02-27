@@ -16,6 +16,9 @@ import {
   AggregateOfferSchema,
   MerchantReturnPolicySchema,
   ItemAvailability,
+  ItemCondition,
+  UnitPriceSpecificationSchema,
+  MerchantReturnPolicySeasonalOverrideSchema,
   createOffer,
   OfferShippingDetailsSchema,
   DefinedRegionSchema,
@@ -25,9 +28,15 @@ import {
   HowToSectionSchema,
   ClipSchema,
   BroadcastEventSchema,
+  SeekToActionSchema,
   VideoObjectSchema,
   createVideoObject,
   PersonOrOrgRef,
+  InteractionCounterSchema,
+  MemberProgramSchema,
+  MemberProgramTierSchema,
+  ShippingServiceSchema,
+  ShippingConditionsSchema,
 } from "../src/index";
 
 // ─── PostalAddress ────────────────────────────────────────────────────────────
@@ -448,5 +457,192 @@ describe("OfferSchema — shippingDetails", () => {
       },
     });
     expect((offer.shippingDetails as any)?.["@type"]).toBe("OfferShippingDetails");
+  });
+});
+
+// ─── ItemCondition ────────────────────────────────────────────────────────────
+
+describe("ItemCondition", () => {
+  it("transforms NewCondition to schema.org URL", () => {
+    expect(ItemCondition.parse("NewCondition")).toBe("https://schema.org/NewCondition");
+  });
+
+  it("transforms UsedCondition to schema.org URL", () => {
+    expect(ItemCondition.parse("UsedCondition")).toBe("https://schema.org/UsedCondition");
+  });
+
+  it("transforms RefurbishedCondition to schema.org URL", () => {
+    expect(ItemCondition.parse("RefurbishedCondition")).toBe("https://schema.org/RefurbishedCondition");
+  });
+});
+
+// ─── UnitPriceSpecification ───────────────────────────────────────────────────
+
+describe("UnitPriceSpecificationSchema", () => {
+  it("parses a basic unit price", () => {
+    const spec = UnitPriceSpecificationSchema.parse({
+      price: 9.99,
+      priceCurrency: "USD",
+    });
+    expect(spec["@type"]).toBe("UnitPriceSpecification");
+    expect(spec.price).toBe(9.99);
+  });
+
+  it("accepts priceType and validForMemberTier", () => {
+    const spec = UnitPriceSpecificationSchema.parse({
+      price: 7.99,
+      priceCurrency: "USD",
+      priceType: "SalePrice",
+      validForMemberTier: "Gold",
+    });
+    expect(spec.priceType).toBe("SalePrice");
+    expect(spec.validForMemberTier).toBe("Gold");
+  });
+
+  it("accepts membershipPointsEarned", () => {
+    const spec = UnitPriceSpecificationSchema.parse({
+      price: 5.00,
+      priceCurrency: "USD",
+      membershipPointsEarned: { value: 500, unitText: "Points" },
+    });
+    expect((spec.membershipPointsEarned as any)?.value).toBe(500);
+  });
+});
+
+// ─── MerchantReturnPolicySeasonalOverride ─────────────────────────────────────
+
+describe("MerchantReturnPolicySeasonalOverrideSchema", () => {
+  it("parses seasonal override", () => {
+    const override = MerchantReturnPolicySeasonalOverrideSchema.parse({
+      startDate: "2025-11-01",
+      endDate: "2026-01-31",
+      returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+      merchantReturnDays: 60,
+    });
+    expect(override["@type"]).toBe("MerchantReturnPolicySeasonalOverride");
+    expect(override.merchantReturnDays).toBe(60);
+  });
+});
+
+// ─── MerchantReturnPolicy (expanded fields) ───────────────────────────────────
+
+describe("MerchantReturnPolicySchema (expanded)", () => {
+  it("accepts new fields: merchantReturnLink, returnShippingFeesAmount, returnPolicyCountry", () => {
+    const policy = MerchantReturnPolicySchema.parse({
+      merchantReturnLink: "https://example.com/returns",
+      returnShippingFeesAmount: { "@type": "MonetaryAmount", currency: "USD", value: 5 },
+      returnPolicyCountry: "US",
+    });
+    expect(policy.merchantReturnLink).toBe("https://example.com/returns");
+    expect(policy.returnPolicyCountry).toBe("US");
+  });
+
+  it("accepts customer remorse fields", () => {
+    const policy = MerchantReturnPolicySchema.parse({
+      customerRemorseReturnFees: "https://schema.org/FreeReturn",
+      customerRemorseReturnLabelSource: "https://schema.org/ReturnLabelCustomerResponsibility",
+    });
+    expect(policy.customerRemorseReturnFees).toBe("https://schema.org/FreeReturn");
+  });
+
+  it("accepts returnPolicySeasonalOverride", () => {
+    const policy = MerchantReturnPolicySchema.parse({
+      returnPolicySeasonalOverride: {
+        startDate: "2025-12-01",
+        endDate: "2026-01-15",
+        merchantReturnDays: 90,
+      },
+    });
+    expect((policy.returnPolicySeasonalOverride as any)?.["@type"]).toBe("MerchantReturnPolicySeasonalOverride");
+  });
+});
+
+// ─── SeekToAction ─────────────────────────────────────────────────────────────
+
+describe("SeekToActionSchema", () => {
+  it("sets @type = SeekToAction and default startOffset-input", () => {
+    const action = SeekToActionSchema.parse({
+      target: "https://example.com/video?t={seek_to_second_number}",
+    });
+    expect(action["@type"]).toBe("SeekToAction");
+    expect(action["startOffset-input"]).toBe("required name=seek_to_second_number");
+  });
+
+  it("can be added to VideoObjectSchema as potentialAction", () => {
+    const video = VideoObjectSchema.parse({
+      name: "Demo",
+      thumbnailUrl: "https://example.com/thumb.jpg",
+      uploadDate: "2025-01-01",
+      potentialAction: {
+        target: "https://example.com/video?t={seek_to_second_number}",
+      },
+    });
+    expect((video.potentialAction as any)?.["@type"]).toBe("SeekToAction");
+  });
+});
+
+// ─── InteractionCounter ───────────────────────────────────────────────────────
+
+describe("InteractionCounterSchema", () => {
+  it("parses a like interaction", () => {
+    const counter = InteractionCounterSchema.parse({
+      interactionType: "https://schema.org/LikeAction",
+      userInteractionCount: 1234,
+    });
+    expect(counter["@type"]).toBe("InteractionCounter");
+    expect(counter.userInteractionCount).toBe(1234);
+  });
+});
+
+// ─── MemberProgram ────────────────────────────────────────────────────────────
+
+describe("MemberProgramSchema", () => {
+  it("parses a basic member program", () => {
+    const program = MemberProgramSchema.parse({
+      name: "Gold Rewards",
+    });
+    expect(program["@type"]).toBe("MemberProgram");
+    expect(program.name).toBe("Gold Rewards");
+  });
+
+  it("accepts tiers", () => {
+    const program = MemberProgramSchema.parse({
+      name: "Rewards",
+      hasTiers: [
+        {
+          name: "Silver",
+          hasTierBenefit: "5% discount",
+        },
+        {
+          name: "Gold",
+          hasTierBenefit: ["10% discount", "Free shipping"],
+        },
+      ],
+    });
+    expect(Array.isArray(program.hasTiers)).toBe(true);
+    expect((program.hasTiers as any)[0]["@type"]).toBe("MemberProgramTier");
+  });
+});
+
+// ─── ShippingService ──────────────────────────────────────────────────────────
+
+describe("ShippingServiceSchema", () => {
+  it("parses a basic shipping service", () => {
+    const svc = ShippingServiceSchema.parse({
+      name: "Standard Shipping",
+      fulfillmentType: "Delivery",
+    });
+    expect(svc["@type"]).toBe("ShippingService");
+    expect(svc.name).toBe("Standard Shipping");
+  });
+
+  it("accepts shippingConditions with shippingDestination", () => {
+    const svc = ShippingServiceSchema.parse({
+      shippingConditions: {
+        shippingDestination: { addressCountry: "US" },
+        shippingRate: { "@type": "MonetaryAmount", currency: "USD", value: 0 },
+      },
+    });
+    expect((svc.shippingConditions as any)?.["@type"]).toBe("ShippingConditions");
   });
 });

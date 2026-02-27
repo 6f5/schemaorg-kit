@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { extendThing } from "./Thing";
 import { makeFactory } from "../../core/base";
+import { InteractionCounterSchema } from "../shared/InteractionCounter";
 
 export const PersonSchema = extendThing("Person", {
   givenName: z.string().optional(),
@@ -12,6 +13,12 @@ export const PersonSchema = extendThing("Person", {
   birthDate: z.string().optional(), // ISO 8601
   gender: z.enum(["Male", "Female", "Unknown"]).optional(),
   nationality: z.string().optional(),
+  interactionStatistic: z
+    .union([InteractionCounterSchema, z.array(InteractionCounterSchema)])
+    .optional(),
+  agentInteractionStatistic: z
+    .union([InteractionCounterSchema, z.array(InteractionCounterSchema)])
+    .optional(),
   address: z.object({
     "@type": z.literal("PostalAddress"),
     streetAddress: z.string().optional(),

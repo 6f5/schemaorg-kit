@@ -33,6 +33,12 @@ export const MathSolverSchema = CreativeWorkSchema.extend({
   mathExpression: z.union([z.string(), z.array(z.string())]).optional(),
   educationalLevel: z.string().optional(),
   teaches: z.union([z.string(), z.array(z.string())]).optional(),
+  /** URL of a page describing usage/terms for the solver — Google required field */
+  usageInfo: z.string().url().optional(),
+  /** Learning resource type — defaults to "Math Solver" per Google spec */
+  learningResourceType: z.string().default("Math Solver"),
+  /** Topics the solver assesses */
+  assesses: z.union([z.string(), z.array(z.string())]).optional(),
 });
 
 export type SolveMathAction = z.infer<typeof SolveMathActionSchema>;

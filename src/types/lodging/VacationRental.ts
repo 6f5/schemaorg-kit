@@ -6,16 +6,15 @@ import { ImageOrUrl } from "../shared/ImageObject";
 
 // ─── BedDetails ──────────────────────────────────────────────────────────────
 
+/** Google's exact BedType values per the Vacation Rental spec */
 export const BedTypeEnum = z.enum([
-  "Single bed",
-  "Double bed",
-  "Bunk bed",
-  "Queen bed",
-  "King bed",
-  "Sofa bed",
-  "Cot",
-  "Waterbed",
-  "Toddler bed",
+  "CaliforniaKing",
+  "King",
+  "Queen",
+  "Full",
+  "Double",
+  "SemiDouble",
+  "Single",
 ]);
 
 export const BedDetailsSchema = z.object({
@@ -66,7 +65,9 @@ export const AccommodationSchema = z.object({
     z.array(LocationFeatureSpecificationSchema),
   ]).optional(),
   petsAllowed: z.union([z.boolean(), z.string()]).optional(),
-  url: z.url().optional(),
+  url: z.string().url().optional(),
+  /** "EntirePlace", "PrivateRoom", or "SharedRoom" */
+  additionalType: z.string().optional(),
 });
 
 export type Accommodation = z.infer<typeof AccommodationSchema>;
@@ -119,6 +120,19 @@ export const VacationRentalSchema = LocalBusinessSchema.extend({
   tourBookingPage: z.url().optional(),
   /** Accommodation unit(s) within the rental property — required by Google */
   containsPlace: z.union([AccommodationSchema, z.array(AccommodationSchema)]).optional(),
+  brand: z
+    .union([
+      z.string(),
+      z.object({
+        "@type": z.union([z.literal("Brand"), z.literal("Organization")]),
+        name: z.string(),
+      }),
+    ])
+    .optional(),
+  /** Language(s) the host speaks — ISO 639-1 codes or language names */
+  knowsLanguage: z.union([z.string(), z.array(z.string())]).optional(),
+  /** "EntirePlace", "PrivateRoom", or "SharedRoom" */
+  additionalType: z.string().optional(),
 });
 
 export type VacationRental = z.infer<typeof VacationRentalSchema>;
