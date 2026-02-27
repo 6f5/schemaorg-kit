@@ -61,6 +61,7 @@ export const DatasetSchema = CreativeWorkSchema.extend({
   datePublished: z.string().optional(),          // ISO 8601
   dateModified: z.string().optional(),
   version: z.union([z.string(), z.number()]).optional(),
+  funder: z.union([PersonOrOrgRef, z.array(PersonOrOrgRef)]).optional(),
 });
 
 export type PropertyValue = z.infer<typeof PropertyValueSchema>;

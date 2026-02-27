@@ -5,6 +5,9 @@ import { PostalAddressSchema } from "../shared/PostalAddress";
 import { ContactPointSchema } from "../shared/ContactPoint";
 import { ImageOrUrl } from "../shared/ImageObject";
 import { MerchantReturnPolicySchema } from "../shared/Offer";
+import { InteractionCounterSchema } from "../shared/InteractionCounter";
+import { MemberProgramSchema } from "../shared/MemberProgram";
+import { ShippingServiceSchema } from "../shared/ShippingService";
 
 // Loose reference for nested org references (avoids circular type inference)
 const NestedOrgRef = z.lazy(() =>
@@ -29,15 +32,28 @@ export const OrganizationSchema = extendThing("Organization", {
   taxID: z.string().optional(),
   leiCode: z.string().optional(),
   duns: z.string().optional(),
+  globalLocationNumber: z.string().optional(),   // GS1 GLN
+  naics: z.string().optional(),                  // NAICS industry code
   // Merchant-related (Google seller identity signals):
   hasMerchantReturnPolicy: MerchantReturnPolicySchema.optional(),
-  hasShippingService: z.lazy(() =>
-    z.object({ "@type": z.string() }).catchall(z.unknown())
-  ).optional(),
+  hasShippingService: z
+    .union([ShippingServiceSchema, z.array(ShippingServiceSchema)])
+    .optional(),
+  // Loyalty program:
+  hasMemberProgram: z
+    .union([MemberProgramSchema, z.array(MemberProgramSchema)])
+    .optional(),
+  // Interaction statistics:
+  interactionStatistic: z
+    .union([InteractionCounterSchema, z.array(InteractionCounterSchema)])
+    .optional(),
+  agentInteractionStatistic: z
+    .union([InteractionCounterSchema, z.array(InteractionCounterSchema)])
+    .optional(),
   // Hierarchical organization (loose refs to avoid circular type inference):
   subOrganization: NestedOrgRef.optional(),
   parentOrganization: NestedOrgRef.optional(),
-  sameAs: z.union([z.url(), z.array(z.url())]).optional(),
+  sameAs: z.union([z.string().url(), z.array(z.string().url())]).optional(),
 });
 
 export type Organization = z.infer<typeof OrganizationSchema>;

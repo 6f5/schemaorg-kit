@@ -16,6 +16,8 @@ import {
   createBook,
   createPerson,
   createOrganization,
+  createClaimReview,
+  schema,
   ClipSchema,
   BroadcastEventSchema,
   HowToStepSchema,
@@ -423,5 +425,50 @@ describe("createBook", () => {
     expect(() => BookFormatType.parse("EBook")).not.toThrow();
     expect(() => BookFormatType.parse("Hardcover")).not.toThrow();
     expect(() => BookFormatType.parse("AudioBook")).not.toThrow();
+  });
+});
+
+// ─── ClaimReview ─────────────────────────────────────────────────────────────
+
+describe("createClaimReview", () => {
+  it("sets @type = ClaimReview", () => {
+    const review = createClaimReview({
+      url: "https://example.com/fact-check/1",
+      claimReviewed: "The moon is made of cheese.",
+      reviewRating: {
+        alternateName: "False",
+        ratingValue: 1,
+        bestRating: 5,
+        worstRating: 1,
+      },
+    });
+    expect(review.toObject()["@type"]).toBe("ClaimReview");
+  });
+
+  it("accepts author and itemReviewed", () => {
+    const review = createClaimReview({
+      url: "https://example.com/fact-check/2",
+      claimReviewed: "Vaccines cause autism.",
+      reviewRating: { alternateName: "False" },
+      author: { "@type": "Organization", name: "FactCheck.org" },
+      itemReviewed: {
+        author: "Some Person",
+        datePublished: "2025-01-01",
+        firstAppearance: "https://example.com/claim",
+      },
+      datePublished: "2025-06-01",
+    });
+    const obj = review.toObject();
+    expect((obj.author as any)?.name).toBe("FactCheck.org");
+    expect((obj.itemReviewed as any)?.["@type"]).toBe("Claim");
+  });
+
+  it("schema() factory creates ClaimReview", () => {
+    const review = schema("ClaimReview", {
+      url: "https://example.com/fact-check/3",
+      claimReviewed: "Test claim",
+      reviewRating: { alternateName: "Unverified" },
+    });
+    expect(review.toObject()["@type"]).toBe("ClaimReview");
   });
 });

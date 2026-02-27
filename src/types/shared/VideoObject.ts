@@ -12,7 +12,7 @@ export const ClipSchema = z.object({
   name: z.string(),
   startOffset: z.number(),             // seconds from start
   endOffset: z.number().optional(),    // seconds from start
-  url: z.url().optional(),             // URL pointing to this clip
+  url: z.string().url().optional(),    // URL pointing to this clip
 });
 
 /**
@@ -27,6 +27,22 @@ export const BroadcastEventSchema = z.object({
 });
 
 /**
+ * schema.org/SeekToAction
+ * Enables Video key moments with timestamp deep-links.
+ * The 'startOffset-input' property is a Google-specific annotation.
+ */
+export const SeekToActionSchema = z.object({
+  "@type": z.literal("SeekToAction").default("SeekToAction"),
+  /** URL template with {seek_to_second_number} placeholder */
+  target: z.string(),
+  "startOffset-input": z
+    .string()
+    .default("required name=seek_to_second_number"),
+});
+
+export type SeekToAction = z.infer<typeof SeekToActionSchema>;
+
+/**
  * schema.org/VideoObject
  * Shared by Recipe (video field) and standalone Video rich results.
  * Google required: name, thumbnailUrl, uploadDate
@@ -36,13 +52,13 @@ export const VideoObjectSchema = z.object({
   "@type": z.literal("VideoObject").default("VideoObject"),
   // Required by Google:
   name: z.string(),
-  thumbnailUrl: z.union([z.url(), z.array(z.url())]),
+  thumbnailUrl: z.union([z.string().url(), z.array(z.string().url())]),
   uploadDate: z.string(),              // ISO 8601 date
   // Recommended by Google:
   description: z.string().optional(),
   duration: z.string().optional(),     // ISO 8601 duration, e.g. "PT1M54S"
-  contentUrl: z.url().optional(),
-  embedUrl: z.url().optional(),
+  contentUrl: z.string().url().optional(),
+  embedUrl: z.string().url().optional(),
   // Optional:
   expires: z.string().optional(),      // ISO 8601 — when video is no longer available
   hasPart: z.array(ClipSchema).optional(),
@@ -57,6 +73,10 @@ export const VideoObjectSchema = z.object({
   isLiveBroadcast: z.boolean().optional(),
   publication: BroadcastEventSchema.optional(),
   thumbnail: ImageOrUrl.optional(),
+  /** SeekToAction enables Video key moments via URL template */
+  potentialAction: z
+    .union([SeekToActionSchema, z.array(SeekToActionSchema)])
+    .optional(),
 });
 
 export type Clip = z.infer<typeof ClipSchema>;

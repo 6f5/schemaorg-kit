@@ -24,6 +24,9 @@ import {
   EventStatusType,
   EventAttendanceMode,
   CertificationSchema,
+  InteractionCounterSchema,
+  SizeSpecificationSchema,
+  PeopleAudienceSchema,
 } from "../../src/index";
 
 // ─── Person ───────────────────────────────────────────────────────────────────
@@ -360,5 +363,101 @@ describe("Product — new fields", () => {
       subjectOf: { "@type": "3DModel", contentUrl: "https://example.com/widget.glb", encodingFormat: "model/gltf-binary" },
     });
     expect((product.toObject().subjectOf as any)?.["@type"]).toBe("3DModel");
+  });
+
+  it("accepts pattern, size as string, and inProductGroupWithID", () => {
+    const product = createProduct({
+      name: "T-Shirt",
+      pattern: "Striped",
+      size: "XL",
+      inProductGroupWithID: "GROUP-001",
+    });
+    const obj = product.toObject();
+    expect(obj.pattern).toBe("Striped");
+    expect(obj.size).toBe("XL");
+    expect(obj.inProductGroupWithID).toBe("GROUP-001");
+  });
+
+  it("accepts size as SizeSpecification", () => {
+    const product = createProduct({
+      name: "Jeans",
+      size: SizeSpecificationSchema.parse({ name: "32W x 30L", sizeSystem: "US" }),
+    });
+    expect((product.toObject().size as any)?.["@type"]).toBe("SizeSpecification");
+  });
+
+  it("accepts audience (PeopleAudience)", () => {
+    const product = createProduct({
+      name: "Kids Toy",
+      audience: PeopleAudienceSchema.parse({ suggestedGender: "Male", suggestedMinAge: 3, suggestedMaxAge: 8 }),
+    });
+    expect((product.toObject().audience as any)?.["@type"]).toBe("PeopleAudience");
+  });
+
+  it("accepts positiveNotes and negativeNotes", () => {
+    const product = createProduct({
+      name: "Headphones",
+      positiveNotes: {
+        itemListElement: [
+          { position: 1, name: "Great sound quality" },
+          { position: 2, name: "Comfortable fit" },
+        ],
+      },
+      negativeNotes: {
+        itemListElement: [{ position: 1, name: "Short battery life" }],
+      },
+    });
+    const obj = product.toObject();
+    expect((obj.positiveNotes as any)?.["@type"]).toBe("ItemList");
+    expect((obj.negativeNotes as any)?.["@type"]).toBe("ItemList");
+  });
+});
+
+// ─── Organization (new fields) ────────────────────────────────────────────────
+
+describe("createOrganization (new fields)", () => {
+  it("accepts globalLocationNumber and naics", () => {
+    const org = createOrganization({
+      name: "ACME Corp",
+      globalLocationNumber: "1234567890123",
+      naics: "541511",
+    });
+    const obj = org.toObject();
+    expect(obj.globalLocationNumber).toBe("1234567890123");
+    expect(obj.naics).toBe("541511");
+  });
+
+  it("accepts interactionStatistic and agentInteractionStatistic", () => {
+    const org = createOrganization({
+      name: "ACME Corp",
+      interactionStatistic: InteractionCounterSchema.parse({
+        interactionType: "https://schema.org/FollowAction",
+        userInteractionCount: 5000,
+      }),
+    });
+    expect((org.toObject().interactionStatistic as any)?.userInteractionCount).toBe(5000);
+  });
+
+  it("accepts hasMemberProgram", () => {
+    const org = createOrganization({
+      name: "Loyalty Co",
+      hasMemberProgram: { name: "VIP Club" },
+    });
+    expect((org.toObject().hasMemberProgram as any)?.name).toBe("VIP Club");
+  });
+});
+
+// ─── Person (new fields) ──────────────────────────────────────────────────────
+
+describe("createPerson (new fields)", () => {
+  it("accepts interactionStatistic", () => {
+    const person = createPerson({
+      name: "Jane Doe",
+      interactionStatistic: InteractionCounterSchema.parse({
+        interactionType: "https://schema.org/FollowAction",
+        userInteractionCount: 1200,
+      }),
+    });
+    expect((person.toObject().interactionStatistic as any)?.["@type"]).toBe("InteractionCounter");
   });
 });

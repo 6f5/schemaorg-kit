@@ -46,6 +46,8 @@ export const ReviewSchema = z.object({
   ).optional(),
   name: z.string().optional(),                  // Review headline
   url: z.string().url().optional(),
+  /** ISO 8601 DateTime — required for French vacation rental reviews */
+  contentReferenceTime: z.string().optional(),
 });
 
 /**

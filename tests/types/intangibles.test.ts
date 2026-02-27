@@ -13,8 +13,10 @@ import {
   createPronounceableText,
   FAQPageSchema,
   AnswerSchema,
+  AlignmentObjectSchema,
   MonetaryAmountSchema,
   PostalAddressSchema,
+  InteractionCounterSchema,
 } from "../../src/index";
 
 // ─── Language ─────────────────────────────────────────────────────────────────
@@ -236,5 +238,83 @@ describe("createProfilePage", () => {
       mainEntity: createOrganization({ name: "Acme" }).toObject(),
     });
     expect((page.toObject().mainEntity as any)?.["@type"]).toBe("Organization");
+  });
+});
+
+// ─── Quiz (Education Q&A) ─────────────────────────────────────────────────────
+
+describe("createQuiz (Education Q&A)", () => {
+  it("accepts eduQuestionType on Question", () => {
+    const quiz = createQuiz({
+      name: "Biology Quiz",
+      hasPart: [
+        {
+          "@type": "Question",
+          name: "What is photosynthesis?",
+          eduQuestionType: "Flashcard",
+          acceptedAnswer: { "@type": "Answer", text: "The process by which plants make food." },
+        },
+      ],
+    });
+    const parts = quiz.toObject().hasPart as any[];
+    expect(parts[0].eduQuestionType).toBe("Flashcard");
+  });
+
+  it("accepts educationalAlignment as AlignmentObject", () => {
+    const quiz = createQuiz({
+      name: "Math Quiz",
+      educationalAlignment: AlignmentObjectSchema.parse({
+        alignmentType: "educationalSubject",
+        targetName: "Algebra",
+        educationalFramework: "Common Core",
+      }),
+    });
+    expect((quiz.toObject().educationalAlignment as any)?.["@type"]).toBe("AlignmentObject");
+  });
+
+  it("accepts educationalAlignment as array", () => {
+    const quiz = createQuiz({
+      name: "Science Quiz",
+      educationalAlignment: [
+        AlignmentObjectSchema.parse({ alignmentType: "educationalSubject", targetName: "Physics" }),
+        AlignmentObjectSchema.parse({ alignmentType: "educationalLevel", targetName: "High School" }),
+      ],
+    });
+    expect(Array.isArray(quiz.toObject().educationalAlignment)).toBe(true);
+  });
+});
+
+// ─── DiscussionForumPosting (new fields) ──────────────────────────────────────
+
+describe("createDiscussionForumPosting (new fields)", () => {
+  it("accepts creativeWorkStatus", () => {
+    const post = createDiscussionForumPosting({
+      headline: "My Post",
+      author: "Jane",
+      creativeWorkStatus: "published",
+    });
+    expect(post.toObject().creativeWorkStatus).toBe("published");
+  });
+
+  it("accepts dateModified and mainEntityOfPage", () => {
+    const post = createDiscussionForumPosting({
+      headline: "My Post",
+      author: "Jane",
+      dateModified: "2025-06-15",
+      mainEntityOfPage: "https://example.com/forum/post/1",
+    });
+    expect(post.toObject().dateModified).toBe("2025-06-15");
+  });
+
+  it("uses shared InteractionCounterSchema", () => {
+    const post = createDiscussionForumPosting({
+      headline: "Popular Post",
+      author: "Jane",
+      interactionStatistic: InteractionCounterSchema.parse({
+        interactionType: "https://schema.org/LikeAction",
+        userInteractionCount: 99,
+      }),
+    });
+    expect((post.toObject().interactionStatistic as any)?.["@type"]).toBe("InteractionCounter");
   });
 });

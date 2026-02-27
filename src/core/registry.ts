@@ -20,6 +20,7 @@ import { RecipeSchema } from "../types/creative-works/Recipe";
 import { CourseSchema } from "../types/creative-works/Course";
 import { SoftwareApplicationSchema } from "../types/creative-works/SoftwareApplication";
 import { MathSolverSchema } from "../types/creative-works/MathSolver";
+import { ClaimReviewSchema } from "../types/creative-works/ClaimReview";
 
 // Intangibles
 import { LanguageSchema, PronounceableTextSchema } from "../types/intangibles/Language";
@@ -61,6 +62,7 @@ const REGISTRY = {
   Course: CourseSchema,
   SoftwareApplication: SoftwareApplicationSchema,
   MathSolver: MathSolverSchema,
+  ClaimReview: ClaimReviewSchema,
 
   // Intangibles
   Language: LanguageSchema,
