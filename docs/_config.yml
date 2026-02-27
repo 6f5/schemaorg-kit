@@ -84,6 +84,7 @@ collections:
 # Exclude from build
 exclude:
   - node_modules/
+  - vendor/
   - "*.gemspec"
   - Gemfile
   - Gemfile.lock
