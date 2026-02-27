@@ -13,7 +13,7 @@ url: "" # set to your GitHub Pages URL, e.g. https://your-org.github.io
 baseurl: "/schemaorg-kit" # set to your repo name
 
 # Theme color
-color_scheme: default
+color_scheme: light
 
 # Logo and favicon
 # logo: "/assets/logo.png"
