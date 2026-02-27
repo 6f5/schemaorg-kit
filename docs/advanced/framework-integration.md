@@ -23,6 +23,7 @@ In the App Router, inject structured data using `<script>` in server components:
 
 ### Single schema
 
+{% raw %}
 ```tsx
 // app/blog/[slug]/page.tsx
 import { createArticle, createBreadcrumbList, createGraph } from 'schemaorg-kit';
@@ -58,9 +59,11 @@ export default async function BlogPost({ params }: { params: { slug: string } })
   );
 }
 ```
+{% endraw %}
 
 ### Layout-level schema (Organization + WebSite)
 
+{% raw %}
 ```tsx
 // app/layout.tsx
 import { createGraph, createOrganization, createWebSite } from 'schemaorg-kit';
@@ -92,6 +95,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   );
 }
 ```
+{% endraw %}
 
 ---
 
@@ -99,6 +103,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 In the Pages Router, use `next/head`:
 
+{% raw %}
 ```tsx
 // pages/products/[slug].tsx
 import Head from 'next/head';
@@ -134,6 +139,7 @@ export default function ProductPage({ product }) {
   );
 }
 ```
+{% endraw %}
 
 ---
 
@@ -222,6 +228,7 @@ In SvelteKit, use `svelte:head`:
 
 In Remix, use the `links` export or inject in the root component:
 
+{% raw %}
 ```tsx
 // app/routes/products.$slug.tsx
 import { json } from '@remix-run/node';
@@ -262,6 +269,7 @@ export default function ProductPage() {
   );
 }
 ```
+{% endraw %}
 
 ---
 

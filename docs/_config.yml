@@ -3,10 +3,9 @@ description: >-
   Type-safe schema.org structured data for every Google rich result type.
   Build JSON-LD with Zod validation, full TypeScript inference, and @graph support.
 
-remote_theme: just-the-docs/just-the-docs
+theme: just-the-docs
 
 plugins:
-  - jekyll-remote-theme
   - jekyll-seo-tag
 
 # Site settings
