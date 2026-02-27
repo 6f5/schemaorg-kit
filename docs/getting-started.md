@@ -217,6 +217,7 @@ This is useful when the type is determined at runtime (e.g., from a CMS content 
 
 ### Next.js (App Router)
 
+{% raw %}
 ```tsx
 // app/products/[id]/page.tsx
 import { createProduct } from 'schemaorg-kit';
@@ -240,9 +241,11 @@ export default function ProductPage({ product }) {
   );
 }
 ```
+{% endraw %}
 
 ### Next.js (Pages Router)
 
+{% raw %}
 ```tsx
 // pages/products/[id].tsx
 import Head from 'next/head';
@@ -261,6 +264,7 @@ export default function ProductPage({ product }) {
   );
 }
 ```
+{% endraw %}
 
 ### Astro
 

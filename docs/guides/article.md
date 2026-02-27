@@ -108,6 +108,7 @@ const graph = createGraph([article, breadcrumbs]);
 ```
 
 **In Next.js (App Router):**
+{% raw %}
 ```tsx
 // app/blog/[slug]/page.tsx
 export default function BlogPost() {
@@ -123,6 +124,7 @@ export default function BlogPost() {
   );
 }
 ```
+{% endraw %}
 
 ---
 
