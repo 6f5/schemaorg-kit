@@ -14,13 +14,13 @@
   ],
   "license": "MIT",
   "author": "",
-  "homepage": "https://github.com/your-org/schemaorg-kit#readme",
+  "homepage": "https://github.com/6f5/schemaorg-kit#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/your-org/schemaorg-kit.git"
+    "url": "git+https://github.com/6f5/schemaorg-kit"
   },
   "bugs": {
-    "url": "https://github.com/your-org/schemaorg-kit/issues"
+    "url": "https://github.com/6f5/schemaorg-kit/issues"
   },
   "sideEffects": false,
   "main": "dist/index.js",
