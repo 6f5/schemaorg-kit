@@ -34,7 +34,7 @@ aux_links:
   "npm":
     - "https://www.npmjs.com/package/schemaorg-kit"
   "GitHub":
-    - "https://github.com/your-org/schemaorg-kit"
+    - "https://github.com/6f5/schemaorg-kit"
 
 aux_links_new_tab: true
 
