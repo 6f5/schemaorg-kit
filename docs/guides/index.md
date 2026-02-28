@@ -27,6 +27,12 @@ Step-by-step guides for generating Google-eligible rich results with `schemaorg-
 | [Vacation Rental](vacation-rental) | Amenities, rating | Property listings |
 | [Book Actions](book) | Read / Borrow buttons *(invite-only)* | Book & publishing pages |
 | [Website & Sitelinks](website) | Sitelinks search box | Homepage |
+| [Claim Review](claim-review) | Fact-check verdict label | Fact-checking articles |
+| [Discussion Forum](discussion-forum) | Forum thread snippet | Forums, communities |
+| [Education Q&A](education-qa) | Flashcard / practice Qs | Study & flashcard pages |
+| [Math Solver](math-solver) | Math solver feature | Online math tools |
+| [Profile Page](profile-page) | Creator profile signals | Author & profile pages |
+| [Person](person) | Author / creator identity | Author bios, team pages |
 | [@graph — Multi-Schema Pages](multi-schema) | Combined signals | Any page with multiple entities |
 
 ---

@@ -242,14 +242,17 @@ Google required: `headline`, `author`. Google recommended: `datePublished`, `url
 | `author` | `Person \| Organization` | **Required** — post author |
 | `text` | `string?` | Post body |
 | `datePublished` | `string?` | ISO 8601 |
+| `dateModified` | `string?` | ISO 8601 |
 | `url` | `string?` | Permalink |
 | `comment` | `Comment[]?` | Threaded replies |
 | `commentCount` | `number?` | Total comment count |
 | `upvoteCount` | `number?` | Upvotes |
 | `downvoteCount` | `number?` | Downvotes |
+| `image` | `string \| ImageObject?` | Post image |
+| `creativeWorkStatus` | `string?` | `"published"`, `"draft"`, `"deleted"` |
+| `mainEntityOfPage` | `string \| object?` | Page this is the main entity of |
 | `sharedContent` | `object?` | Reposted content |
-| `interactionStatistic` | `InteractionCounter[]?` | Like/share counts |
-| `isPartOf` | `object?` | Forum section |
+| `interactionStatistic` | `InteractionCounter \| []?` | Like/share counts |
 | `inLanguage` | `string?` | Language |
 
 ---
@@ -336,6 +339,10 @@ Extends `LocalBusiness`. Adds lodging-specific fields for [Vacation Rental](http
 | `starRating` | `Rating?` | Official star rating |
 | `leaseLength` | `Duration \| QuantitativeValue?` | Minimum stay |
 | `floorSize` | `QuantitativeValue?` | Property size |
+| `brand` | `string \| Brand \| Organization?` | Property brand/chain |
+| `knowsLanguage` | `string \| string[]?` | Host languages (ISO 639-1) |
+| `additionalType` | `string?` | `"EntirePlace"`, `"PrivateRoom"`, `"SharedRoom"` |
+| `containsPlace` | `Accommodation \| []?` | Units within the property |
 
 ```ts
 const rental = createVacationRental({
