@@ -247,10 +247,14 @@ const rating = EmployerAggregateRatingSchema.parse({
 
 ---
 
-## OfferSchema / createOffer / ItemAvailability
+## OfferSchema / createOffer / ItemAvailability / ItemCondition
 
 ```ts
-import { OfferSchema, createOffer, ItemAvailability, type Offer } from 'schemaorg-kit';
+import {
+  OfferSchema, createOffer, ItemAvailability, ItemCondition,
+  UnitPriceSpecificationSchema,
+  type Offer,
+} from 'schemaorg-kit';
 ```
 
 Pricing information for products, apps, courses, events, etc.
@@ -259,17 +263,20 @@ Pricing information for products, apps, courses, events, etc.
 
 | Field | Type | Notes |
 |-------|------|-------|
-| `price` | `number?` | Price (use `0` for free) |
-| `priceCurrency` | `string?` | ISO 4217 code, e.g. `"USD"` |
+| `price` | `number \| string` | Price (use `0` for free) |
+| `priceCurrency` | `string` | ISO 4217 code (3 chars), e.g. `"USD"` |
 | `availability` | `ItemAvailability?` | Auto-transforms to schema.org URL |
+| `itemCondition` | `ItemCondition?` | Auto-transforms to schema.org URL |
 | `url` | `string?` | Purchase URL |
 | `priceValidUntil` | `string?` | ISO 8601 expiry date |
 | `validFrom` | `string?` | Offer start date |
-| `description` | `string?` | Offer description |
-| `seller` | `Person \| Organization?` | Who is selling |
-| `itemCondition` | `string?` | New, Used, Refurbished |
+| `validThrough` | `string?` | Offer end date |
+| `seller` | `{ @type, name }?` | Who is selling |
+| `category` | `string?` | Offer category |
+| `inventoryLevel` | `QuantitativeValue?` | Stock level |
+| `priceSpecification` | `UnitPriceSpecification \| []?` | Loyalty/unit pricing (see below) |
+| `shippingDetails` | `OfferShippingDetails \| []?` | Shipping info (see below) |
 | `hasMerchantReturnPolicy` | `MerchantReturnPolicy?` | Return policy |
-| `shippingDetails` | `OfferShippingDetails \| OfferShippingDetails[]?` | Shipping info (see below) |
 
 ### ItemAvailability values
 
@@ -285,12 +292,22 @@ Pricing information for products, apps, courses, events, etc.
 | `"BackOrder"` | `https://schema.org/BackOrder` |
 | `"Discontinued"` | `https://schema.org/Discontinued` |
 
+### ItemCondition values
+
+| Input | Transformed output |
+|-------|-------------------|
+| `"NewCondition"` | `https://schema.org/NewCondition` |
+| `"UsedCondition"` | `https://schema.org/UsedCondition` |
+| `"RefurbishedCondition"` | `https://schema.org/RefurbishedCondition` |
+| `"DamagedCondition"` | `https://schema.org/DamagedCondition` |
+
 ```ts
 // Using createOffer factory (returns SchemaNode)
 const offer = createOffer({
   price: 29.99,
   priceCurrency: 'USD',
-  availability: 'InStock',  // → "https://schema.org/InStock"
+  availability: 'InStock',       // → "https://schema.org/InStock"
+  itemCondition: 'NewCondition', // → "https://schema.org/NewCondition"
   priceValidUntil: '2025-12-31',
   url: 'https://example.com/buy',
 });
@@ -300,6 +317,33 @@ const offerObj = OfferSchema.parse({
   price: 0,
   priceCurrency: 'USD',
   availability: 'InStock',
+});
+```
+
+### UnitPriceSpecificationSchema
+
+For loyalty pricing, member-tier pricing, or unit-based pricing on Google Merchant Listings.
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `price` | `number \| string` | **Required** |
+| `priceCurrency` | `string` | **Required** — ISO 4217 (3 chars) |
+| `priceType` | `string?` | `"SRP"`, `"ListPrice"`, `"SalePrice"`, etc. |
+| `validForMemberTier` | `string \| object?` | Member tier this price applies to |
+| `referenceQuantity` | `QuantitativeValue?` | Unit reference (e.g. per 100g) |
+| `membershipPointsEarned` | `QuantitativeValue?` | Loyalty points earned |
+| `validFrom` | `string?` | ISO 8601 |
+| `validThrough` | `string?` | ISO 8601 |
+
+```ts
+import { UnitPriceSpecificationSchema } from 'schemaorg-kit';
+
+const loyaltyPrice = UnitPriceSpecificationSchema.parse({
+  price: 24.99,
+  priceCurrency: 'USD',
+  priceType: 'SalePrice',
+  validForMemberTier: { '@type': 'MemberProgramTier', name: 'Gold' },
+  membershipPointsEarned: { '@type': 'QuantitativeValue', value: 50 },
 });
 ```
 
@@ -420,6 +464,26 @@ import { MerchantReturnPolicySchema, type MerchantReturnPolicy } from 'schemaorg
 
 Used on `Organization.hasMerchantReturnPolicy` and `Product.hasMerchantReturnPolicy` to improve Product rich result eligibility.
 
+### Fields
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `applicableCountry` | `string \| string[]?` | ISO 3166-1 alpha-2 |
+| `returnPolicyCategory` | `string?` | Schema.org enum URL |
+| `merchantReturnDays` | `number?` | Days allowed for returns |
+| `returnMethod` | `string?` | Schema.org enum URL |
+| `returnFees` | `string?` | Schema.org enum URL |
+| `refundType` | `string?` | Schema.org enum URL |
+| `merchantReturnLink` | `string?` | URL to return policy page |
+| `returnShippingFeesAmount` | `MonetaryAmount?` | Shipping cost for returns |
+| `itemCondition` | `ItemCondition \| []?` | Condition(s) eligible for return |
+| `returnLabelSource` | `string?` | Schema.org enum URL |
+| `returnPolicyCountry` | `string?` | ISO 3166-1 alpha-2 |
+| `restockingFee` | `MonetaryAmount \| number?` | Restocking fee |
+| `returnPolicySeasonalOverride` | `SeasonalOverride \| []?` | Holiday return window |
+| `customerRemorseReturnFees` | `string?` | Buyer's remorse return fees |
+| `itemDefectReturnFees` | `string?` | Defective item return fees |
+
 ```ts
 const returnPolicy = MerchantReturnPolicySchema.parse({
   applicableCountry: ['US', 'CA', 'GB'],
@@ -427,7 +491,9 @@ const returnPolicy = MerchantReturnPolicySchema.parse({
   merchantReturnDays: 30,
   returnMethod: 'https://schema.org/ReturnByMail',
   returnFees: 'https://schema.org/FreeReturn',
+  merchantReturnLink: 'https://example.com/returns',
   returnPolicySeasonalOverride: {
+    '@type': 'MerchantReturnPolicySeasonalOverride',
     startDate: '2025-11-15',
     endDate: '2026-01-31',
     returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
@@ -523,6 +589,145 @@ Used on: `author`, `publisher`, `creator`, `contributor`, `copyrightHolder`, `hi
 
 ---
 
-## ClipSchema / BroadcastEventSchema / VideoObjectSchema
+## ClipSchema / BroadcastEventSchema / SeekToActionSchema / VideoObjectSchema
 
 See [Creative Works → createVideoObject](creative-works#createvideoobject).
+
+---
+
+## InteractionCounterSchema
+
+```ts
+import { InteractionCounterSchema, type InteractionCounter } from 'schemaorg-kit';
+```
+
+Tracks user interactions (likes, shares, views, etc.). Used on `VideoObject.interactionStatistic`, `DiscussionForumPosting.interactionStatistic`, `Person.interactionStatistic`, and `Organization.interactionStatistic`.
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `interactionType` | `string` | **Required** — Full URL, e.g. `"https://schema.org/LikeAction"` |
+| `userInteractionCount` | `number` | **Required** — Non-negative integer |
+
+```ts
+const counter = InteractionCounterSchema.parse({
+  interactionType: 'https://schema.org/WatchAction',
+  userInteractionCount: 1250000,
+});
+```
+
+Common interaction types: `LikeAction`, `ShareAction`, `WatchAction`, `CommentAction`, `FollowAction`, `WriteAction`
+
+---
+
+## MemberProgramSchema / MemberProgramTierSchema
+
+```ts
+import { MemberProgramSchema, MemberProgramTierSchema, type MemberProgram } from 'schemaorg-kit';
+```
+
+For Google's Merchant Listing loyalty program support. Used on `Organization.hasMemberProgram`.
+
+### MemberProgramTierSchema fields
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `name` | `string` | **Required** — Tier name, e.g. "Gold" |
+| `hasTierBenefit` | `string \| string[]` | **Required** — Benefit names |
+| `hasTierRequirement` | `string \| object?` | Requirements to reach this tier |
+| `membershipPointsEarned` | `QuantitativeValue?` | Points earned per purchase |
+| `url` | `string?` | Tier details page |
+
+### MemberProgramSchema fields
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `name` | `string` | **Required** — Program name |
+| `description` | `string?` | Program description |
+| `hasTiers` | `MemberProgramTier \| []?` | Loyalty tiers |
+| `url` | `string?` | Program page URL |
+
+```ts
+const loyaltyProgram = MemberProgramSchema.parse({
+  name: 'Acme Rewards',
+  description: 'Earn points on every purchase.',
+  url: 'https://acme.com/rewards',
+  hasTiers: [
+    MemberProgramTierSchema.parse({
+      name: 'Silver',
+      hasTierBenefit: ['Free shipping on orders over $25'],
+    }),
+    MemberProgramTierSchema.parse({
+      name: 'Gold',
+      hasTierBenefit: ['Free shipping on all orders', '10% member discount'],
+      membershipPointsEarned: { '@type': 'QuantitativeValue', value: 2, unitText: 'points per dollar' },
+    }),
+  ],
+});
+```
+
+---
+
+## ShippingServiceSchema / ShippingConditionsSchema / ServicePeriodSchema
+
+```ts
+import {
+  ShippingServiceSchema,
+  ShippingConditionsSchema,
+  ServicePeriodSchema,
+  type ShippingService,
+} from 'schemaorg-kit';
+```
+
+Organization-level shipping service definitions for Google Merchant Listings. Used on `Organization.hasShippingService`.
+
+### ShippingServiceSchema fields
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `name` | `string?` | Service name, e.g. "Standard Shipping" |
+| `description` | `string?` | Service description |
+| `shippingConditions` | `ShippingConditions \| []?` | Rate/region/time rules |
+| `handlingTime` | `ServicePeriod?` | Business-day handling window |
+| `fulfillmentType` | `string?` | `"Delivery"`, `"Pickup"`, `"DigitalDelivery"` |
+| `validForMemberTier` | `string \| object?` | Restrict to a loyalty tier |
+
+### ShippingConditionsSchema fields
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `shippingRate` | `MonetaryAmount?` | Shipping cost |
+| `shippingDestination` | `DefinedRegion \| []?` | Where it ships |
+| `shippingOrigin` | `DefinedRegion \| []?` | Where it ships from |
+| `deliveryTime` | `ShippingDeliveryTime?` | Handling + transit time |
+| `doesNotShip` | `boolean?` | Explicitly mark no-ship |
+| `orderValue` | `MonetaryAmount?` | Minimum order value |
+| `numItems` | `QuantitativeValue?` | Item count constraint |
+| `weight` | `QuantitativeValue?` | Weight constraint |
+
+### ServicePeriodSchema fields
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `businessDays` | `OpeningHoursSpecification?` | Which days orders are processed |
+| `cutoffTime` | `string?` | ISO 8601 time, e.g. `"14:00:00-05:00"` |
+| `duration` | `string?` | ISO 8601 duration, e.g. `"P3D"` |
+
+```ts
+import { createOrganization, ShippingServiceSchema, ShippingConditionsSchema } from 'schemaorg-kit';
+
+const org = createOrganization({
+  name: 'Acme Store',
+  hasShippingService: ShippingServiceSchema.parse({
+    name: 'Free Standard Shipping',
+    fulfillmentType: 'Delivery',
+    shippingConditions: ShippingConditionsSchema.parse({
+      shippingRate: { '@type': 'MonetaryAmount', currency: 'USD', value: 0 },
+      shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'US' },
+      deliveryTime: {
+        '@type': 'ShippingDeliveryTime',
+        transitTime: { '@type': 'QuantitativeValue', minValue: 3, maxValue: 7 },
+      },
+    }),
+  }),
+});
+```

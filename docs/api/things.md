@@ -64,6 +64,8 @@ Represents a real person. Used as `author`, `director`, `instructor`, etc.
 | `award` | `string \| string[]?` | Awards received |
 | `honorificPrefix` | `string?` | Dr., Prof., etc. |
 | `honorificSuffix` | `string?` | PhD, Esq., etc. |
+| `interactionStatistic` | `InteractionCounter \| []?` | Engagement stats |
+| `agentInteractionStatistic` | `InteractionCounter \| []?` | Creator activity stats |
 
 ### Example
 
@@ -125,7 +127,13 @@ All share the same field set. `createOnlineStore` and `createOnlineBusiness` imp
 | `vatID` | `string?` | VAT number (trust signal) |
 | `iso6523Code` | `string?` | e.g. DUNS number (trust signal) |
 | `sameAs` | `string \| string[]?` | Wikipedia, social profiles, Crunchbase |
+| `globalLocationNumber` | `string?` | GS1 GLN |
+| `naics` | `string?` | NAICS industry code |
 | `hasMerchantReturnPolicy` | `MerchantReturnPolicy?` | Return policy (helps Product eligibility) |
+| `hasShippingService` | `ShippingService \| []?` | Org-level shipping service |
+| `hasMemberProgram` | `MemberProgram \| []?` | Loyalty/membership program |
+| `interactionStatistic` | `InteractionCounter \| []?` | Engagement stats |
+| `agentInteractionStatistic` | `InteractionCounter \| []?` | Activity stats |
 | `numberOfEmployees` | `QuantitativeValue?` | `{ "@type": "QuantitativeValue", value: 500 }` |
 | `subOrganization` | `Organization?` | A subsidiary |
 | `parentOrganization` | `Organization?` | Parent company |
@@ -189,7 +197,13 @@ import { createProduct, createProductGroup, createOffer } from 'schemaorg-kit';
 | `hasCertification` | `Certification \| Certification[]?` | Safety/quality certifications |
 | `subjectOf` | `3DModel \| 3DModel[]?` | 3D model for Google Images/Shopping |
 | `isVariantOf` | `ProductGroup?` | Parent product group |
+| `inProductGroupWithID` | `string?` | ID of the parent ProductGroup |
 | `additionalProperty` | `PropertyValue \| PropertyValue[]?` | Custom attributes |
+| `pattern` | `string?` | Design pattern, e.g. "Stripes" |
+| `size` | `string \| SizeSpecification?` | Size value or structured spec |
+| `audience` | `PeopleAudience?` | Target audience (gender, age) |
+| `positiveNotes` | `ItemList?` | Pros (editorial) |
+| `negativeNotes` | `ItemList?` | Cons (editorial) |
 
 ### CertificationSchema
 
@@ -226,6 +240,30 @@ const product = createProduct({
   }),
 });
 ```
+
+### SizeSpecificationSchema
+
+```ts
+import { SizeSpecificationSchema } from 'schemaorg-kit';
+```
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `name` | `string?` | Size label, e.g. "10" |
+| `sizeSystem` | `string?` | `"US"`, `"EU"`, `"UK"`, `"JP"` |
+| `sizeGroup` | `string \| string[]?` | `"Petite"`, `"Plus"`, `"Regular"`, etc. |
+
+### PeopleAudienceSchema
+
+```ts
+import { PeopleAudienceSchema } from 'schemaorg-kit';
+```
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `suggestedGender` | `string?` | `"Male"`, `"Female"`, `"Unknown"` |
+| `suggestedMinAge` | `number?` | Minimum age |
+| `suggestedMaxAge` | `number?` | Maximum age |
 
 ### createProductGroup fields
 

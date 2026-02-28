@@ -363,6 +363,7 @@ import { createVideoObject, ClipSchema, BroadcastEventSchema } from 'schemaorg-k
 | `hasPart` | `Clip[]?` | Key moments (chapters) |
 | `isLiveBroadcast` | `boolean?` | Is/was live |
 | `publication` | `BroadcastEvent?` | Live broadcast details |
+| `potentialAction` | `SeekToAction \| []?` | Key moments via URL template |
 | `regionsAllowed` | `string \| string[]?` | ISO 3166-1 country codes |
 | `requiresSubscription` | `boolean?` | Paywalled? |
 | `interactionStatistic` | `InteractionCounter?` | View count |
@@ -385,6 +386,19 @@ BroadcastEventSchema.parse({
   isLiveBroadcast: true,
   startDate: '2025-06-01T09:00:00-07:00',
   endDate:   '2025-06-01T11:00:00-07:00',
+})
+```
+
+### SeekToActionSchema — Key Moments
+
+Enables timestamp deep-links for videos hosted on your own site (non-YouTube). The `target` URL template must contain a `{seek_to_second_number}` placeholder.
+
+```ts
+import { SeekToActionSchema } from 'schemaorg-kit';
+
+SeekToActionSchema.parse({
+  target: 'https://example.com/video?t={seek_to_second_number}',
+  // 'startOffset-input' defaults to 'required name=seek_to_second_number'
 })
 ```
 
@@ -511,6 +525,9 @@ For Google's [Math Solver](https://developers.google.com/search/docs/appearance/
 | `mathExpression` | `string \| string[]?` | Example expressions |
 | `educationalLevel` | `string?` | Level (e.g. "high school") |
 | `teaches` | `string \| string[]?` | Topics covered |
+| `usageInfo` | `string?` | URL to terms/usage page — **Google required** |
+| `learningResourceType` | `string?` | Defaults to `"Math Solver"` |
+| `assesses` | `string \| string[]?` | Topics the solver assesses |
 
 ```ts
 const solver = createMathSolver({
@@ -527,5 +544,60 @@ const solver = createMathSolver({
       },
     },
   },
+});
+```
+
+---
+
+## createClaimReview
+
+```ts
+import { createClaimReview, ClaimSchema, ClaimReviewSchema } from 'schemaorg-kit';
+```
+
+For Google's [Fact Check](https://developers.google.com/search/docs/appearance/structured-data/factcheck) rich result. Required: `url`, `claimReviewed`, `reviewRating.alternateName`.
+
+### ClaimReviewSchema fields
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `url` | `string` | **Required** — URL of the fact-check article |
+| `claimReviewed` | `string` | **Required** — The text of the claim |
+| `reviewRating` | `Rating` | **Required** — Must include `alternateName` (e.g. "False") |
+| `author` | `Person \| Organization?` | The fact-checker |
+| `itemReviewed` | `Claim?` | The structured Claim object |
+| `datePublished` | `string?` | ISO 8601 |
+| `dateModified` | `string?` | ISO 8601 |
+| `inLanguage` | `string?` | Language code |
+
+### ClaimSchema fields
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `author` | `Person \| Organization?` | Who made the claim |
+| `datePublished` | `string?` | When the claim was made |
+| `firstAppearance` | `string?` | URL of first appearance |
+| `appearance` | `string \| string[]?` | URL(s) of other appearances |
+
+### Example
+
+```ts
+const factCheck = createClaimReview({
+  url: 'https://factcheck.example.com/2025/claim-about-climate',
+  claimReviewed: 'Global temperatures have not risen since 2010.',
+  reviewRating: {
+    '@type': 'Rating',
+    alternateName: 'False',
+    ratingValue: 1,
+    bestRating: 5,
+    worstRating: 1,
+  },
+  author: { '@type': 'Organization', name: 'FactCheck.org' },
+  datePublished: '2025-06-15',
+  itemReviewed: ClaimSchema.parse({
+    author: { '@type': 'Person', name: 'Jane Doe' },
+    datePublished: '2025-06-10',
+    firstAppearance: 'https://blog.example.com/climate-post',
+  }),
 });
 ```
