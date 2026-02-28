@@ -56,10 +56,10 @@ export const SoftwareApplicationSchema = CreativeWorkSchema.extend({
   // Optional:
   softwareVersion: z.string().optional(),
   fileSize: z.string().optional(),
-  downloadUrl: z.url().optional(),
+  downloadUrl: z.string().url().optional(),
   screenshot: z.union([ImageOrUrl, z.array(ImageOrUrl)]).optional(),
   featureList: z.union([z.string(), z.array(z.string())]).optional(),
-  installUrl: z.url().optional(),
+  installUrl: z.string().url().optional(),
   softwareRequirements: z.string().optional(),
   permissions: z.string().optional(),
   // WebApplication specific:

@@ -28,7 +28,7 @@ export const SolveMathActionSchema = z.object({
 export const MathSolverSchema = CreativeWorkSchema.extend({
   "@type": z.literal("MathSolver").default("MathSolver"),
   name: z.string(),
-  url: z.url().optional(),
+  url: z.string().url().optional(),
   potentialAction: z.union([SolveMathActionSchema, z.array(SolveMathActionSchema)]).optional(),
   mathExpression: z.union([z.string(), z.array(z.string())]).optional(),
   educationalLevel: z.string().optional(),

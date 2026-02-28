@@ -9,15 +9,15 @@ import { makeFactory } from "../../core/base";
  */
 export const ImageObjectSchema = z.object({
   "@type": z.literal("ImageObject").default("ImageObject"),
-  url: z.url(),
-  contentUrl: z.url().optional(),
+  url: z.string().url(),
+  contentUrl: z.string().url().optional(),
   width: z.union([
     z.number(),
-    z.object({ "@type": z.literal("QuantitativeValue"), value: z.number(), unitCode: z.string().optional() }),
+    z.object({ "@type": z.literal("QuantitativeValue").default("QuantitativeValue"), value: z.number(), unitCode: z.string().optional() }),
   ]).optional(),
   height: z.union([
     z.number(),
-    z.object({ "@type": z.literal("QuantitativeValue"), value: z.number(), unitCode: z.string().optional() }),
+    z.object({ "@type": z.literal("QuantitativeValue").default("QuantitativeValue"), value: z.number(), unitCode: z.string().optional() }),
   ]).optional(),
   caption: z.string().optional(),
   description: z.string().optional(),
@@ -26,20 +26,20 @@ export const ImageObjectSchema = z.object({
   creator: PersonOrOrgRef.optional(),
   creditText: z.string().optional(),
   copyrightNotice: z.string().optional(),
-  license: z.url().optional(),
-  acquireLicensePage: z.url().optional(),
+  license: z.string().url().optional(),
+  acquireLicensePage: z.string().url().optional(),
   representativeOfPage: z.boolean().optional(),
   encodingFormat: z.string().optional(),       // MIME type, e.g. "image/jpeg"
   uploadDate: z.string().optional(),
-  thumbnailUrl: z.url().optional(),
-  embedUrl: z.url().optional(),
+  thumbnailUrl: z.string().url().optional(),
+  embedUrl: z.string().url().optional(),
 });
 
 /**
  * Convenience union: accepts either a URL string or a full ImageObject.
  * Used throughout: Thing.image, Organization.logo, etc.
  */
-export const ImageOrUrl = z.union([z.url(), ImageObjectSchema]);
+export const ImageOrUrl = z.union([z.string().url(), ImageObjectSchema]);
 
 export type ImageObject = z.infer<typeof ImageObjectSchema>;
 

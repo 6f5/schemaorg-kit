@@ -16,11 +16,11 @@ import { ImageOrUrl } from "../shared/ImageObject";
 export const CertificationSchema = z.object({
   "@type": z.literal("Certification").default("Certification"),
   name: z.string(),
-  url: z.url().optional(),
+  url: z.string().url().optional(),
   issuedBy: z.object({
     "@type": z.literal("Organization").default("Organization"),
     name: z.string(),
-    url: z.url().optional(),
+    url: z.string().url().optional(),
   }).optional(),
   certificationRatingValue: z.string().optional(),
   certificationStatus: z.string().optional(),
@@ -39,7 +39,7 @@ export type Certification = z.infer<typeof CertificationSchema>;
  */
 export const ThreeDModelSchema = z.object({
   "@type": z.literal("3DModel").default("3DModel"),
-  contentUrl: z.url(),
+  contentUrl: z.string().url(),
   /** MIME type, e.g. "model/gltf-binary", "model/gltf+json" */
   encodingFormat: z.string().optional(),
   name: z.string().optional(),

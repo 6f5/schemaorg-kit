@@ -24,7 +24,7 @@ export const MovieSchema = extendThing("Movie", {
   countryOfOrigin: z.string().optional(),        // ISO 3166
   inLanguage: z.union([
     z.string(),
-    z.object({ "@type": z.literal("Language"), name: z.string() }),
+    z.object({ "@type": z.literal("Language").default("Language"), name: z.string() }),
   ]).optional(),
   aggregateRating: AggregateRatingSchema.optional(),
   review: z.union([ReviewSchema, z.array(ReviewSchema)]).optional(),
@@ -34,7 +34,7 @@ export const MovieSchema = extendThing("Movie", {
   contentRating: z.string().optional(),          // e.g. "MPAA PG-13"
   genre: z.union([z.string(), z.array(z.string())]).optional(),
   // For carousels: itemListElement links
-  sameAs: z.union([z.url(), z.array(z.url())]).optional(),
+  sameAs: z.union([z.string().url(), z.array(z.string().url())]).optional(),
 });
 
 export type Movie = z.infer<typeof MovieSchema>;

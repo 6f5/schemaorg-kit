@@ -8,7 +8,7 @@ import { makeFactory } from "../../core/base";
 export const ListItemSchema = z.object({
   "@type": z.literal("ListItem").default("ListItem"),
   position: z.number().int().positive(),
-  url: z.url().optional(),
+  url: z.string().url().optional(),
   name: z.string().optional(),
   // item: the actual entity being listed (loose ref to any schema node)
   item: z.lazy(() =>
@@ -25,7 +25,7 @@ export const ItemListSchema = z.object({
   "@type": z.literal("ItemList").default("ItemList"),
   name: z.string().optional(),
   description: z.string().optional(),
-  url: z.url().optional(),
+  url: z.string().url().optional(),
   itemListOrder: z.enum(["Ascending", "Descending", "Unordered"])
     .transform((v) => `https://schema.org/ItemListOrder${v}`)
     .optional(),

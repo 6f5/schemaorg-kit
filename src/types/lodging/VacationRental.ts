@@ -117,7 +117,7 @@ export const VacationRentalSchema = LocalBusinessSchema.extend({
   }).optional(),
   numberOfBathroomsTotal: z.number().int().nonnegative().optional(),
   numberOfBedrooms: z.number().int().nonnegative().optional(),
-  tourBookingPage: z.url().optional(),
+  tourBookingPage: z.string().url().optional(),
   /** Accommodation unit(s) within the rental property — required by Google */
   containsPlace: z.union([AccommodationSchema, z.array(AccommodationSchema)]).optional(),
   brand: z

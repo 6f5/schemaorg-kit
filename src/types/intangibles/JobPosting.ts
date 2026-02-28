@@ -21,9 +21,9 @@ export const EmploymentType = z.enum([
 const HiringOrgRef = z.object({
   "@type": z.union([z.literal("Organization"), z.literal("LocalBusiness")]).default("Organization"),
   name: z.string(),
-  sameAs: z.url().optional(),
+  sameAs: z.string().url().optional(),
   logo: ImageOrUrl.optional(),
-  url: z.url().optional(),
+  url: z.string().url().optional(),
 });
 
 const JobLocationRef = z.object({
@@ -81,8 +81,8 @@ export const JobPostingSchema = z.object({
   industry: z.string().optional(),
   occupationalCategory: z.string().optional(),   // O*NET-SOC codes
   workHours: z.string().optional(),
-  url: z.url().optional(),
-  sameAs: z.url().optional(),
+  url: z.string().url().optional(),
+  sameAs: z.string().url().optional(),
 });
 
 export type JobPosting = z.infer<typeof JobPostingSchema>;

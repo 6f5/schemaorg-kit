@@ -267,6 +267,22 @@ describe("createLocalBusiness", () => {
     });
     expect((lb.toObject().aggregateRating as any)?.ratingValue).toBe(4.5);
   });
+
+  it("accepts @type as array of strings", () => {
+    const lb = createLocalBusiness({
+      "@type": ["Restaurant", "LocalBusiness"],
+      name: "Italian Bistro",
+    });
+    expect(lb.toObject()["@type"]).toEqual(["Restaurant", "LocalBusiness"]);
+  });
+
+  it("accepts @type as any string (custom subtypes)", () => {
+    const lb = createLocalBusiness({
+      "@type": "Dentist",
+      name: "Smile Dental",
+    });
+    expect(lb.toObject()["@type"]).toBe("Dentist");
+  });
 });
 
 // ─── Movie ────────────────────────────────────────────────────────────────────
