@@ -301,6 +301,176 @@ export const createService = makeFactory(ServiceSchema);
 {: .warning }
 > Properties not listed in [Google's structured data documentation](https://developers.google.com/search/docs/appearance/structured-data) are ignored by Google. They are still valid JSON-LD and may be consumed by other search engines, AI assistants, or knowledge graph systems.
 
+### Creating a RealEstateListing
+
+Google does not support `RealEstateListing` for rich results. The only property-related type Google supports is `VacationRental` (short-term rentals), which is already built in. However, `RealEstateListing` is a valid schema.org type and may be useful for other search engines, AI assistants, or MLS integrations.
+
+```ts
+import { z } from 'zod';
+import { extendThing, makeFactory, createGraph, SchemaIds } from 'schemaorg-kit';
+
+// ── Reusable sub-schemas ─────────────────────────────────────────────
+
+const AccommodationSchema = z.object({
+  '@type': z.enum([
+    'Accommodation',
+    'Apartment',
+    'House',
+    'SingleFamilyResidence',
+  ]).default('SingleFamilyResidence'),
+  numberOfRooms: z.number().int().positive().optional(),
+  numberOfBedrooms: z.number().int().nonnegative().optional(),
+  numberOfBathroomsTotal: z.number().int().nonnegative().optional(),
+  floorSize: z.object({
+    '@type': z.literal('QuantitativeValue').default('QuantitativeValue'),
+    value: z.number().positive(),
+    unitCode: z.enum(['SQF', 'SQM']),       // sq ft or sq m
+    unitText: z.string().optional(),
+  }).optional(),
+  yearBuilt: z.number().int().optional(),
+  numberOfFullBathrooms: z.number().int().nonnegative().optional(),
+  numberOfPartialBathrooms: z.number().int().nonnegative().optional(),
+  petsAllowed: z.union([z.boolean(), z.string()]).optional(),
+  amenityFeature: z.array(z.object({
+    '@type': z.literal('LocationFeatureSpecification').default('LocationFeatureSpecification'),
+    name: z.string(),
+    value: z.union([z.boolean(), z.string(), z.number()]).optional(),
+  })).optional(),
+  permittedUsage: z.string().optional(),
+});
+
+// ── RealEstateListing ────────────────────────────────────────────────
+
+const RealEstateListingSchema = extendThing('RealEstateListing', {
+  datePosted: z.string().optional(),          // ISO 8601 date
+  leaseLength: z.union([
+    z.string(),                                // ISO 8601 duration, e.g. "P1Y"
+    z.object({
+      '@type': z.literal('QuantitativeValue').default('QuantitativeValue'),
+      value: z.number(),
+      unitCode: z.string(),                    // "MON", "ANN", etc.
+    }),
+  ]).optional(),
+  containsPlace: AccommodationSchema.optional(),
+  offers: z.object({
+    '@type': z.literal('Offer').default('Offer'),
+    price: z.number().nonnegative(),
+    priceCurrency: z.string(),
+    availability: z.string().optional(),
+    validFrom: z.string().optional(),
+  }).optional(),
+});
+
+export const createRealEstateListing = makeFactory(RealEstateListingSchema);
+
+// ── Usage: Single-family home for sale ───────────────────────────────
+
+const listing = createRealEstateListing({
+  name: '4BR Modern Farmhouse in Bellevue',
+  url: 'https://realty.example/listings/bellevue-farmhouse',
+  image: [
+    'https://realty.example/photos/bellevue-1.jpg',
+    'https://realty.example/photos/bellevue-2.jpg',
+  ],
+  description: 'Stunning 4-bedroom modern farmhouse with open floor plan, gourmet kitchen, and mountain views.',
+  datePosted: '2025-06-15',
+  containsPlace: {
+    '@type': 'SingleFamilyResidence',
+    numberOfBedrooms: 4,
+    numberOfBathroomsTotal: 3,
+    floorSize: { value: 2800, unitCode: 'SQF' },
+    yearBuilt: 2022,
+    amenityFeature: [
+      { name: 'Garage', value: true },
+      { name: 'Central Air', value: true },
+      { name: 'Lot Size', value: '0.35 acres' },
+    ],
+  },
+  offers: {
+    price: 1250000,
+    priceCurrency: 'USD',
+    availability: 'InStock',
+  },
+});
+
+// ── Usage: Apartment for rent ────────────────────────────────────────
+
+const rental = createRealEstateListing({
+  name: '2BR Apartment in Capitol Hill',
+  url: 'https://realty.example/listings/capitol-hill-apt',
+  image: 'https://realty.example/photos/capitol-hill.jpg',
+  datePosted: '2025-07-01',
+  leaseLength: { value: 12, unitCode: 'MON' },
+  containsPlace: {
+    '@type': 'Apartment',
+    numberOfBedrooms: 2,
+    numberOfBathroomsTotal: 1,
+    floorSize: { value: 950, unitCode: 'SQF' },
+    petsAllowed: 'Cats only',
+    amenityFeature: [
+      { name: 'In-Unit Laundry', value: true },
+      { name: 'Parking', value: 'Street' },
+    ],
+  },
+  offers: {
+    price: 2400,
+    priceCurrency: 'USD',
+  },
+});
+```
+
+#### Combining with @graph
+
+Pair the listing with a `RealEstateAgent` (a built-in `LocalBusiness` subtype) and breadcrumbs:
+
+```ts
+import { createGraph, createLocalBusiness, createBreadcrumbList, SchemaIds } from 'schemaorg-kit';
+import { createRealEstateListing } from './your-schemas';
+
+const ids = new SchemaIds('https://realty.example');
+
+const graph = createGraph([
+  createLocalBusiness({
+    '@type': 'RealEstateAgent',
+    '@id': ids.localBusiness(),
+    name: 'Cascade Realty Group',
+    url: 'https://realty.example',
+    telephone: '+1-425-555-0199',
+    address: {
+      addressLocality: 'Bellevue',
+      addressRegion: 'WA',
+      addressCountry: 'US',
+    },
+  }),
+  createRealEstateListing({
+    name: '4BR Modern Farmhouse in Bellevue',
+    url: 'https://realty.example/listings/bellevue-farmhouse',
+    datePosted: '2025-06-15',
+    image: 'https://realty.example/photos/bellevue-1.jpg',
+    containsPlace: {
+      '@type': 'SingleFamilyResidence',
+      numberOfBedrooms: 4,
+      numberOfBathroomsTotal: 3,
+      floorSize: { value: 2800, unitCode: 'SQF' },
+      yearBuilt: 2022,
+    },
+    offers: {
+      price: 1250000,
+      priceCurrency: 'USD',
+      availability: 'InStock',
+    },
+  }),
+  createBreadcrumbList([
+    { name: 'Home', url: 'https://realty.example' },
+    { name: 'Listings', url: 'https://realty.example/listings' },
+    { name: 'Bellevue Farmhouse' },
+  ]),
+]);
+```
+
+{: .note }
+> `RealEstateAgent` is a valid `@type` value for `createLocalBusiness()` — no custom schema needed. Google supports `LocalBusiness` rich results for real estate agencies.
+
 ---
 
 ## Validating Custom Fields
