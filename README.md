@@ -8,7 +8,7 @@
 
 ## Features
 
-- **35+ factory functions** covering all Google-supported rich result types
+- **40+ factory functions** covering all Google-supported rich result types
 - **Zod v4 validation** with descriptive error messages at runtime
 - **Full TypeScript autocomplete** — every field, every enum value
 - **`@graph` support** for multi-entity pages with cross-references
@@ -151,6 +151,7 @@ const event   = schema("Event",   { name: "Conference", startDate: "2025-09-01" 
 | `createMobileApplication` | `MobileApplication` |
 | `createWebApplication` | `WebApplication` |
 | `createMathSolver` | `MathSolver` |
+| `createClaimReview` | `ClaimReview` (Fact Check) |
 
 ### Intangibles & Other
 
@@ -160,7 +161,7 @@ const event   = schema("Event",   { name: "Conference", startDate: "2025-09-01" 
 | `createImageObject` | `ImageObject` |
 | `createVideoObject` | `VideoObject` |
 | `createJobPosting` | `JobPosting` |
-| `createQAPage` / `createQuiz` | `QAPage` / `Quiz` |
+| `createQAPage` / `createQuiz` / `createQuestion` | `QAPage` / `Quiz` / `Question` |
 | `createDiscussionForumPosting` | `DiscussionForumPosting` |
 | `createProfilePage` | `ProfilePage` |
 | `createVacationRental` | `VacationRental` |
@@ -265,10 +266,13 @@ src/
 │   └── graph.ts             # SchemaGraph + createGraph()
 ├── types/
 │   ├── shared/              # Reusable building blocks
-│   │   ├── Offer.ts         # Offer, AggregateOffer, MerchantReturnPolicy
+│   │   ├── Offer.ts         # Offer, AggregateOffer, MerchantReturnPolicy, UnitPriceSpecification, ItemCondition
 │   │   ├── ShippingDetails.ts # OfferShippingDetails, DefinedRegion, ShippingDeliveryTime
 │   │   ├── Rating.ts        # Rating, AggregateRating, Review, EmployerAggregateRating
-│   │   ├── VideoObject.ts   # VideoObject, Clip, BroadcastEvent
+│   │   ├── VideoObject.ts   # VideoObject, Clip, BroadcastEvent, SeekToAction
+│   │   ├── InteractionCounter.ts # InteractionCounter (likes, shares, views)
+│   │   ├── MemberProgram.ts # MemberProgram, MemberProgramTier (loyalty)
+│   │   ├── ShippingService.ts # ShippingService, ShippingConditions, ServicePeriod
 │   │   └── ...
 │   ├── things/              # Person, Organization, Product, Place, Event, ...
 │   ├── creative-works/      # Article, WebPage, WebSite, Recipe, Book, ...
