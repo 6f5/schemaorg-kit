@@ -14,7 +14,7 @@ import { ImageOrUrl } from "../shared/ImageObject";
 export const PlaceSchema = extendThing("Place", {
   address: z.union([z.string(), PostalAddressSchema]).optional(),
   geo: GeoCoordinatesSchema.optional(),
-  hasMap: z.url().optional(),
+  hasMap: z.string().url().optional(),
   photo: z.union([ImageOrUrl, z.array(ImageOrUrl)]).optional(),
   telephone: z.string().optional(),
   faxNumber: z.string().optional(),

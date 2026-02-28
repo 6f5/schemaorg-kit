@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { extendThing } from "./Thing";
 import { makeFactory } from "../../core/base";
+import { PostalAddressSchema } from "../shared/PostalAddress";
 import { InteractionCounterSchema } from "../shared/InteractionCounter";
 
 export const PersonSchema = extendThing("Person", {
@@ -19,14 +20,7 @@ export const PersonSchema = extendThing("Person", {
   agentInteractionStatistic: z
     .union([InteractionCounterSchema, z.array(InteractionCounterSchema)])
     .optional(),
-  address: z.object({
-    "@type": z.literal("PostalAddress"),
-    streetAddress: z.string().optional(),
-    addressLocality: z.string().optional(),
-    addressRegion: z.string().optional(),
-    postalCode: z.string().optional(),
-    addressCountry: z.string().optional(),
-  }).optional(),
+  address: z.union([z.string(), PostalAddressSchema]).optional(),
 });
 
 export type Person = z.infer<typeof PersonSchema>;

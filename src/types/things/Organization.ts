@@ -16,7 +16,7 @@ const NestedOrgRef = z.lazy(() =>
 
 export const OrganizationSchema = extendThing("Organization", {
   legalName: z.string().optional(),
-  email: z.email().optional(),
+  email: z.string().email().optional(),
   telephone: z.string().optional(),
   logo: ImageOrUrl.optional(),
   foundingDate: z.string().optional(),           // ISO 8601 date

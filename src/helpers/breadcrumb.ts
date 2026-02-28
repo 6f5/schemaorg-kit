@@ -8,7 +8,7 @@ const BreadcrumbListSchema = z.object({
       "@type": z.literal("ListItem").default("ListItem"),
       position: z.number().int().positive(),
       name: z.string(),
-      item: z.url().optional(),
+      item: z.string().url().optional(),
     })
   ),
 });

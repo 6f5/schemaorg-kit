@@ -14,7 +14,7 @@ import { PersonOrOrgRef } from "../shared/PersonOrOrgRef";
  */
 export const WebSiteSchema = CreativeWorkSchema.extend({
   "@type": z.literal("WebSite").default("WebSite"),
-  url: z.url().optional(),
+  url: z.string().url().optional(),
   name: z.string().optional(),
   /**
    * Sitelinks Searchbox via SearchAction.

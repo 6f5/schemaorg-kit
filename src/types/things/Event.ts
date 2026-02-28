@@ -32,14 +32,14 @@ export const EventAttendanceMode = z.enum([
 const PlaceRef = z.union([
   z.string(),
   z.object({
-    "@type": z.literal("Place"),
+    "@type": z.literal("Place").default("Place"),
     name: z.string().optional(),
     address: z.union([z.string(), PostalAddressSchema]).optional(),
-    url: z.url().optional(),
+    url: z.string().url().optional(),
   }),
   z.object({
-    "@type": z.literal("VirtualLocation"),
-    url: z.url(),
+    "@type": z.literal("VirtualLocation").default("VirtualLocation"),
+    url: z.string().url(),
     name: z.string().optional(),
   }),
   PostalAddressSchema,
@@ -74,7 +74,7 @@ export const EventSchema = extendThing("Event", {
     z.object({ "@type": z.string() }).catchall(z.unknown())
   ).optional(),
   // Additional:
-  inLanguage: z.union([z.string(), z.object({ "@type": z.literal("Language"), name: z.string() })]).optional(),
+  inLanguage: z.union([z.string(), z.object({ "@type": z.literal("Language").default("Language"), name: z.string() })]).optional(),
   isAccessibleForFree: z.boolean().optional(),
   maximumAttendeeCapacity: z.number().int().nonnegative().optional(),
   remainingAttendeeCapacity: z.number().int().nonnegative().optional(),

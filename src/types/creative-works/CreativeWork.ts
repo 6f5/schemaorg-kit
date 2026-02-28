@@ -16,10 +16,10 @@ export const CreativeWorkSchema = extendThing("CreativeWork", {
   keywords: z.union([z.string(), z.array(z.string())]).optional(),
   inLanguage: z.union([
     z.string(),                                  // BCP 47, e.g. "en-US"
-    z.object({ "@type": z.literal("Language"), name: z.string() }),
+    z.object({ "@type": z.literal("Language").default("Language"), name: z.string() }),
   ]).optional(),
-  license: z.url().optional(),
-  thumbnailUrl: z.url().optional(),
+  license: z.string().url().optional(),
+  thumbnailUrl: z.string().url().optional(),
   isAccessibleForFree: z.boolean().optional(),
   image: z.union([ImageOrUrl, z.array(ImageOrUrl)]).optional(),
   // Paywalled content support:
@@ -36,7 +36,7 @@ export const CreativeWorkSchema = extendThing("CreativeWork", {
   text: z.string().optional(),
   abstract: z.string().optional(),
   encodingFormat: z.string().optional(),         // MIME type
-  contentUrl: z.url().optional(),
+  contentUrl: z.string().url().optional(),
   copyrightYear: z.number().int().optional(),
   copyrightHolder: PersonOrOrgRef.optional(),
 });

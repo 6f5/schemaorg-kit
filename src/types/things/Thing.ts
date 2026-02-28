@@ -21,19 +21,19 @@ export const ThingSchema = z.object({
   // Core identity
   name: z.string().optional(),
   description: z.string().optional(),
-  url: z.url().optional(),
+  url: z.string().url().optional(),
   identifier: z.union([z.string(), z.number()]).optional(),
 
   // Media — single image or array (Google recommends multiple aspect ratios)
   image: z.union([ImageOrUrl, z.array(ImageOrUrl)]).optional(),
 
   // Discovery
-  sameAs: z.union([z.url(), z.array(z.url())]).optional(),
+  sameAs: z.union([z.string().url(), z.array(z.string().url())]).optional(),
   alternateName: z.string().optional(),
 
   // Relationships (loose refs to avoid circular type inference)
   subjectOf: AnyThingRef.optional(),
-  mainEntityOfPage: z.union([z.url(), AnyThingRef]).optional(),
+  mainEntityOfPage: z.union([z.string().url(), AnyThingRef]).optional(),
 });
 
 export type Thing = z.infer<typeof ThingSchema>;

@@ -49,7 +49,7 @@ export const CourseSchema = CreativeWorkSchema.extend({
     z.object({
       "@type": z.literal("EducationalOccupationalCredential").default("EducationalOccupationalCredential"),
       name: z.string(),
-      url: z.url().optional(),
+      url: z.string().url().optional(),
     }),
   ]).optional(),
   occupationalCredentialAwarded: z.union([z.string(), z.array(z.string())]).optional(),

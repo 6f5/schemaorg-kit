@@ -34,10 +34,10 @@ export const WebPageSchema = CreativeWorkSchema.extend({
     cssSelector: z.union([z.string(), z.array(z.string())]).optional(),
     xpath: z.union([z.string(), z.array(z.string())]).optional(),
   }).optional(),
-  significantLink: z.union([z.url(), z.array(z.url())]).optional(),
+  significantLink: z.union([z.string().url(), z.array(z.string().url())]).optional(),
   mainContentOfPage: z.object({ "@type": z.string() }).catchall(z.unknown()).optional(),
   primaryImageOfPage: z.object({ "@type": z.string() }).catchall(z.unknown()).optional(),
-  relatedLink: z.union([z.url(), z.array(z.url())]).optional(),
+  relatedLink: z.union([z.string().url(), z.array(z.string().url())]).optional(),
 });
 
 export type WebPage = z.infer<typeof WebPageSchema>;

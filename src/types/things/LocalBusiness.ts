@@ -31,10 +31,13 @@ export const LocalBusinessSchema = PlaceSchema.extend({
     z.literal("GroceryStore"),
     z.literal("ShoppingCenter"),
     z.literal("TravelAgency"),
+    // Google allows @type to be a string or array for multi-typed entities
+    z.string(),
+    z.array(z.string()),
   ]).default("LocalBusiness"),
   // Business identity:
   legalName: z.string().optional(),
-  email: z.email().optional(),
+  email: z.string().email().optional(),
   logo: ImageOrUrl.optional(),
   contactPoint: z.union([ContactPointSchema, z.array(ContactPointSchema)]).optional(),
   // Ratings & reviews:
@@ -46,13 +49,13 @@ export const LocalBusinessSchema = PlaceSchema.extend({
   paymentAccepted: z.string().optional(),
   // Food establishment specific:
   servesCuisine: z.union([z.string(), z.array(z.string())]).optional(),
-  hasMenu: z.url().optional(),
-  acceptsReservations: z.union([z.boolean(), z.url()]).optional(),
+  hasMenu: z.string().url().optional(),
+  acceptsReservations: z.union([z.boolean(), z.string().url()]).optional(),
   // Merchant signals:
   vatID: z.string().optional(),
   iso6523Code: z.string().optional(),
   hasMerchantReturnPolicy: MerchantReturnPolicySchema.optional(),
-  sameAs: z.union([z.url(), z.array(z.url())]).optional(),
+  sameAs: z.union([z.string().url(), z.array(z.string().url())]).optional(),
   // Departments (nested LocalBusiness):
   department: z.lazy(() =>
     z.union([

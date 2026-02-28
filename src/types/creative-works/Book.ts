@@ -51,7 +51,7 @@ export const BorrowActionSchema = z.object({
       z.literal("Library"),
     ]),
     name: z.string(),
-    url: z.url().optional(),
+    url: z.string().url().optional(),
     /** Unique identifier for the library system */
     "@id": z.string().optional(),
   }),
@@ -87,7 +87,7 @@ export const BookEditionSchema = z.object({
   /** Publication date for this edition */
   datePublished: z.string().optional(),
   /** Landing page for this edition */
-  url: z.url().optional(),
+  url: z.string().url().optional(),
   /** Authors of this edition (may differ from work author) */
   author: z.union([PersonOrOrgRef, z.array(PersonOrOrgRef)]).optional(),
   /** ReadAction or BorrowAction for Google Book Actions */
@@ -121,7 +121,7 @@ export const BookSchema = z.object({
   /** Primary author(s) of the work */
   author: z.union([PersonOrOrgRef, z.array(PersonOrOrgRef)]),
   /** Canonical URL for the book's landing page */
-  url: z.url().optional(),
+  url: z.string().url().optional(),
   /** Cover image */
   image: z.union([ImageOrUrl, z.array(ImageOrUrl)]).optional(),
   description: z.string().optional(),
@@ -135,7 +135,7 @@ export const BookSchema = z.object({
   publisher: z.object({
     "@type": z.union([z.literal("Organization"), z.literal("Person")]),
     name: z.string(),
-    url: z.url().optional(),
+    url: z.string().url().optional(),
   }).optional(),
   /** Number of pages */
   numberOfPages: z.number().int().positive().optional(),
