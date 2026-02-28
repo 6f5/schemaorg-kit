@@ -16,4 +16,4 @@ schemas.ts
 types.ts
 
 # Internal testing
-sea.limo.ts
+internal/
