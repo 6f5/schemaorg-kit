@@ -163,32 +163,60 @@ const graph = createGraph([
 
 ## Cross-Referencing with @id
 
-Use `@id` to reference the same entity in multiple places without repeating all its fields:
+Use `@id` to reference the same entity in multiple places without repeating all its fields. The `SchemaIds` helper generates consistent IDs and `{ "@id": "..." }` reference objects:
 
 ```ts
-import { createGraph, createArticle, createOrganization } from 'schemaorg-kit';
+import { SchemaIds, createGraph, createArticle, createOrganization } from 'schemaorg-kit';
+
+const ids = new SchemaIds('https://example.com');
 
 // Define Organization once with @id
 const org = createOrganization({
-  '@id': 'https://example.com/#organization',
+  '@id': ids.organization(),
   name: 'Example Corp',
   url: 'https://example.com',
   logo: 'https://example.com/logo.png',
 });
 
-// Reference it by @id in the Article
+// Reference it by @id in the Article — no "as any" needed
 const article = createArticle({
   headline: 'Our Latest Innovation',
   datePublished: '2025-05-01',
   image: 'https://example.com/innovation.jpg',
-  author: { '@id': 'https://example.com/#organization' } as any,   // reference only
-  publisher: { '@id': 'https://example.com/#organization' } as any,
+  author: ids.ref('organization'),
+  publisher: ids.ref('organization'),
 });
 
 const graph = createGraph([org, article]);
 ```
 
 The `@graph` output will have the full organization definition once, and references to it by `@id` in the article.
+
+### SchemaIds API
+
+```ts
+const ids = new SchemaIds('https://example.com');
+
+// Well-known IDs
+ids.organization()  // "https://example.com/#organization"
+ids.website()       // "https://example.com/#website"
+ids.webpage()       // "https://example.com/#webpage"
+ids.article()       // "https://example.com/#article"
+ids.person()        // "https://example.com/#person"
+// ... and more for all entity types
+
+// Custom fragments
+ids.custom('logo')           // "https://example.com/#logo"
+ids.custom('contactpoint')   // "https://example.com/#contactpoint"
+
+// Page-scoped IDs
+ids.forPath('/about', 'webpage')  // "https://example.com/about#webpage"
+
+// Cross-reference objects for publisher, author, organizer, etc.
+ids.ref('organization')  // { "@id": "https://example.com/#organization" }
+```
+
+See the [Core API docs]({{ site.baseurl }}/api/core/#schemaids) for the full list of methods.
 
 ---
 

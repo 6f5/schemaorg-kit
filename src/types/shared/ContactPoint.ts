@@ -6,6 +6,7 @@ import { z } from "zod";
  */
 export const ContactPointSchema = z.object({
   "@type": z.literal("ContactPoint").default("ContactPoint"),
+  "@id": z.string().optional(),
   telephone: z.string().optional(),
   contactType: z.string().optional(),                    // e.g. "customer support", "sales"
   email: z.string().email().optional(),

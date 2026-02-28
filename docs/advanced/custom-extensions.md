@@ -201,6 +201,108 @@ Note: `socialLinks` is a non-standard field — it will appear in the JSON-LD ou
 
 ---
 
+## Adding Unsupported schema.org Properties
+
+This library focuses on properties that Google actively uses for rich results. Some valid schema.org properties — like `areaServed`, `serviceArea`, or `knowsAbout` — are **not** used by Google and therefore not included in the built-in schemas.
+
+If you need these properties, extend the existing schema with `.extend()`:
+
+### Adding `areaServed` to Organization
+
+```ts
+import { z } from 'zod';
+import { OrganizationSchema, makeFactory } from 'schemaorg-kit';
+
+// AdministrativeArea / City / State — common areaServed values
+const AreaServedRef = z.union([
+  z.string(),
+  z.object({
+    '@type': z.enum(['AdministrativeArea', 'City', 'State', 'Country', 'GeoShape']),
+    name: z.string(),
+  }),
+]);
+
+const OrganizationWithAreaSchema = OrganizationSchema.extend({
+  areaServed: z.union([AreaServedRef, z.array(AreaServedRef)]).optional(),
+});
+
+export const createOrganizationWithArea = makeFactory(OrganizationWithAreaSchema);
+
+const org = createOrganizationWithArea({
+  name: 'Metro Elite Transfer',
+  url: 'https://metroelitetransfer.com',
+  areaServed: [
+    { '@type': 'AdministrativeArea', name: 'Seattle Metropolitan Area' },
+    { '@type': 'City', name: 'Bellevue' },
+    { '@type': 'State', name: 'Washington' },
+  ],
+});
+```
+
+### Adding `areaServed` to LocalBusiness
+
+```ts
+import { z } from 'zod';
+import { LocalBusinessSchema, makeFactory } from 'schemaorg-kit';
+
+const LocalBusinessWithAreaSchema = LocalBusinessSchema.extend({
+  areaServed: z.union([
+    z.string(),
+    z.object({ '@type': z.string(), name: z.string() }),
+    z.array(z.union([
+      z.string(),
+      z.object({ '@type': z.string(), name: z.string() }),
+    ])),
+  ]).optional(),
+});
+
+export const createLocalBusinessWithArea = makeFactory(LocalBusinessWithAreaSchema);
+
+const biz = createLocalBusinessWithArea({
+  '@type': ['LocalBusiness', 'LimousineService'],
+  name: 'Metro Elite Transfer',
+  areaServed: [
+    { '@type': 'City', name: 'Seattle' },
+    { '@type': 'City', name: 'Tacoma' },
+  ],
+});
+```
+
+### Creating a Service type
+
+Google does not support `Service` for rich results, but you may want it for other search engines or knowledge graphs:
+
+```ts
+import { z } from 'zod';
+import { extendThing, makeFactory } from 'schemaorg-kit';
+
+const ServiceSchema = extendThing('Service', {
+  serviceType: z.string().optional(),
+  provider: z.union([
+    z.string(),
+    z.object({ '@type': z.string(), name: z.string() }).catchall(z.unknown()),
+  ]).optional(),
+  areaServed: z.union([
+    z.string(),
+    z.object({ '@type': z.string(), name: z.string() }),
+    z.array(z.union([
+      z.string(),
+      z.object({ '@type': z.string(), name: z.string() }),
+    ])),
+  ]).optional(),
+  offers: z.lazy(() => z.object({ '@type': z.string() }).catchall(z.unknown())).optional(),
+  category: z.string().optional(),
+  termsOfService: z.url().optional(),
+});
+
+export const createService = makeFactory(ServiceSchema);
+```
+
+{: .warning }
+> Properties not listed in [Google's structured data documentation](https://developers.google.com/search/docs/appearance/structured-data) are ignored by Google. They are still valid JSON-LD and may be consumed by other search engines, AI assistants, or knowledge graph systems.
+
+---
+
 ## Validating Custom Fields
 
 Custom fields use the full Zod API — enum, regex, min/max, refine, etc.:

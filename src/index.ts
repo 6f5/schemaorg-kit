@@ -4,6 +4,7 @@
 export { SchemaNode, makeFactory } from "./core/base";
 export { schema, type SchemaType } from "./core/registry";
 export { SchemaGraph, createGraph } from "./core/graph";
+export { SchemaIds, type SchemaId } from "./core/ids";
 
 // ============================================================
 //   Shared building blocks

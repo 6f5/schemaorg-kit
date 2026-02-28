@@ -9,6 +9,7 @@ import { makeFactory } from "../../core/base";
  */
 export const ImageObjectSchema = z.object({
   "@type": z.literal("ImageObject").default("ImageObject"),
+  "@id": z.string().optional(),
   url: z.url(),
   contentUrl: z.url().optional(),
   width: z

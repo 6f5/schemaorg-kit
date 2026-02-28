@@ -87,32 +87,41 @@ console.log(article.toScript());
 
 ## `@graph` Support
 
-Use `createGraph` to output multiple schema nodes in a single `<script>` tag with `@id` cross-references:
+Use `createGraph` to output multiple schema nodes in a single `<script>` tag. Use `SchemaIds` for consistent `@id` cross-references:
 
 ```typescript
 import {
+  SchemaIds,
   createGraph,
+  createOrganization,
+  createWebSite,
   createWebPage,
-  createArticle,
-  createPerson,
 } from "schemaorg-kit";
 
+const ids = new SchemaIds("https://example.com");
+
 const graph = createGraph([
+  createOrganization({
+    "@id": ids.organization(),
+    name: "Acme Corp",
+    url: "https://example.com",
+  }),
+  createWebSite({
+    "@id": ids.website(),
+    name: "Acme",
+    url: "https://example.com",
+    publisher: ids.ref("organization"), // { "@id": "https://example.com/#organization" }
+  }),
   createWebPage({
-    "@id": "https://example.com/post#webpage",
-    url: "https://example.com/post",
+    "@id": ids.webpage(),
+    url: "https://example.com",
   }),
-  createArticle({
-    "@id": "https://example.com/post#article",
-    headline: "Hello World",
-    isPartOf: { "@id": "https://example.com/post#webpage" },
-    author: { "@id": "https://example.com/about#person" },
-  }),
-  createPerson({ "@id": "https://example.com/about#person", name: "Jane Doe" }),
 ]);
 
 console.log(graph.toScript());
 ```
+
+`SchemaIds` provides well-known methods (`organization()`, `website()`, `webpage()`, `person()`, etc.), `custom()` for arbitrary fragments, `forPath()` for page-scoped IDs, and `ref()` for cross-reference objects.
 
 ## Unified Factory
 
@@ -280,7 +289,8 @@ src/
 ├── core/
 │   ├── base.ts              # SchemaNode<T> class + makeFactory()
 │   ├── registry.ts          # Unified schema() factory + REGISTRY
-│   └── graph.ts             # SchemaGraph + createGraph()
+│   ├── graph.ts             # SchemaGraph + createGraph()
+│   └── ids.ts               # SchemaIds + SchemaId (cross-reference helpers)
 ├── types/
 │   ├── shared/              # Reusable building blocks
 │   │   ├── Offer.ts         # Offer, AggregateOffer, MerchantReturnPolicy, UnitPriceSpecification, ItemCondition

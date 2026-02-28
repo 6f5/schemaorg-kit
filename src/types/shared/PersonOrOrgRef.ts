@@ -7,6 +7,8 @@ import { z } from "zod";
  */
 export const PersonOrOrgRef = z.union([
   z.string(),
+  // @id-only reference for @graph cross-referencing (e.g. { "@id": "https://example.com/#organization" })
+  z.object({ "@id": z.string() }),
   // Accept any Person or Organization object — including full schema outputs via .toObject().
   // .catchall() allows extra fields; name/url are optional to match ThingSchema's base types.
   z.object({ "@type": z.literal("Person") }).catchall(z.unknown()),

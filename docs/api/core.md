@@ -178,21 +178,96 @@ Returns `{ "@context": "https://schema.org", "@graph": [...] }`.
 
 ### Cross-referencing with `@id`
 
-Use `@id` fields to cross-reference nodes within the same graph:
+Use `@id` fields to cross-reference nodes within the same graph. The `SchemaIds` helper (see below) makes this easy:
 
 ```ts
+import { SchemaIds, createGraph, createOrganization, createWebPage } from 'schemaorg-kit';
+
+const ids = new SchemaIds('https://acme.com');
+
 const org = createOrganization({
-  '@id': 'https://acme.com/#organization',
+  '@id': ids.organization(),
   name: 'Acme',
 });
 
 const page = createWebPage({
   name: 'Home',
   url: 'https://acme.com',
-  publisher: { '@id': 'https://acme.com/#organization' }, // reference by ID
+  publisher: ids.ref('organization'), // { "@id": "https://acme.com/#organization" }
 });
 
 createGraph([org, page]).toScript();
+```
+
+---
+
+## SchemaIds
+
+Centralized ID generator for JSON-LD `@id` values. Avoids typos and keeps cross-references consistent.
+
+```ts
+import { SchemaIds } from 'schemaorg-kit';
+
+const ids = new SchemaIds('https://example.com');
+```
+
+### `SchemaId` type
+
+A branded `string` type for type-safe `@id` values. Assignable to `string` (works with all `@id` fields), but prevents accidental use of arbitrary strings.
+
+### Well-known IDs
+
+Each method returns a `SchemaId` with the format `{origin}/#{fragment}`:
+
+```ts
+ids.organization()        // "https://example.com/#organization"
+ids.localBusiness()       // "https://example.com/#localbusiness"
+ids.person()              // "https://example.com/#person"
+ids.product()             // "https://example.com/#product"
+ids.event()               // "https://example.com/#event"
+ids.place()               // "https://example.com/#place"
+ids.movie()               // "https://example.com/#movie"
+ids.website()             // "https://example.com/#website"
+ids.webpage()             // "https://example.com/#webpage"
+ids.article()             // "https://example.com/#article"
+ids.breadcrumb()          // "https://example.com/#breadcrumb"
+ids.dataset()             // "https://example.com/#dataset"
+ids.recipe()              // "https://example.com/#recipe"
+ids.course()              // "https://example.com/#course"
+ids.softwareApplication() // "https://example.com/#softwareapplication"
+ids.faqPage()             // "https://example.com/#faqpage"
+ids.jobPosting()          // "https://example.com/#jobposting"
+ids.vacationRental()      // "https://example.com/#vacationrental"
+ids.profilePage()         // "https://example.com/#profilepage"
+```
+
+### `.custom(fragment)`
+
+Generate an ID with any custom fragment:
+
+```ts
+ids.custom('logo')          // "https://example.com/#logo"
+ids.custom('contactpoint')  // "https://example.com/#contactpoint"
+```
+
+### `.forPath(path, fragment)`
+
+Generate a page-scoped ID:
+
+```ts
+ids.forPath('/about', 'webpage')   // "https://example.com/about#webpage"
+ids.forPath('/blog/post', 'article') // "https://example.com/blog/post#article"
+```
+
+### `.ref(fragment)`
+
+Returns a `{ "@id": "..." }` reference object for cross-referencing entities in `@graph`. Use with fields like `publisher`, `organizer`, `author`:
+
+```ts
+createWebSite({
+  '@id': ids.website(),
+  publisher: ids.ref('organization'),  // { "@id": "https://example.com/#organization" }
+});
 ```
 
 ---
