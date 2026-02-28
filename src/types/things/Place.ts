@@ -45,11 +45,14 @@ export const PlaceSchema = extendThing("Place", {
     )
     .optional(),
   containedInPlace: z
-    .lazy(() =>
-      z
-        .object({ "@type": z.string(), name: z.string().optional() })
-        .catchall(z.unknown()),
-    )
+    .union([
+      z.object({ "@id": z.string() }),
+      z.lazy(() =>
+        z
+          .object({ "@type": z.string(), name: z.string().optional() })
+          .catchall(z.unknown()),
+      ),
+    ])
     .optional(),
 });
 

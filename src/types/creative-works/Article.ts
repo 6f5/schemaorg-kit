@@ -43,9 +43,10 @@ export const NewsArticleSchema = ArticleSchema.extend({
  */
 export const BlogPostingSchema = ArticleSchema.extend({
   "@type": z.literal("BlogPosting").default("BlogPosting"),
-  sharedContent: z.lazy(() =>
-    z.object({ "@type": z.string() }).passthrough()
-  ).optional(),
+  sharedContent: z.union([
+    z.object({ "@id": z.string() }),
+    z.lazy(() => z.object({ "@type": z.string() }).catchall(z.unknown())),
+  ]).optional(),
 });
 
 export type Article = z.infer<typeof ArticleSchema>;

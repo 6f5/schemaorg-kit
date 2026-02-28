@@ -37,12 +37,15 @@ export const CreativeWorkSchema = extendThing("CreativeWork", {
       }),
     )
     .optional(),
-  // For subscription / paywalled content
+  // For subscription / paywalled content (accept @id refs for @graph cross-referencing)
   isPartOf: z
-    .object({
-      "@type": z.string(),
-      name: z.string().optional(),
-    })
+    .union([
+      z.object({ "@id": z.string() }),
+      z.object({
+        "@type": z.string(),
+        name: z.string().optional(),
+      }),
+    ])
     .optional(),
   text: z.string().optional(),
   abstract: z.string().optional(),

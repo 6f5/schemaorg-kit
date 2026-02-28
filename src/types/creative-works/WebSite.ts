@@ -42,9 +42,12 @@ export const WebSiteSchema = CreativeWorkSchema.extend({
   publisher: PersonOrOrgRef.optional(),
   // Site-level metadata
   copyrightYear: z.number().int().optional(),
-  // isPartOf — rarely used for WebSite itself but allowed
+  // isPartOf — rarely used for WebSite itself but allowed (accept @id refs for @graph)
   isPartOf: z
-    .lazy(() => z.object({ "@type": z.string() }).catchall(z.unknown()))
+    .union([
+      z.object({ "@id": z.string() }),
+      z.lazy(() => z.object({ "@type": z.string() }).catchall(z.unknown())),
+    ])
     .optional(),
 });
 

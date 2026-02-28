@@ -25,9 +25,12 @@ export type { Article, NewsArticle, BlogPosting } from "./Article";
 export const WebPageSchema = CreativeWorkSchema.extend({
   "@type": z.literal("WebPage").default("WebPage"),
   breadcrumb: z
-    .lazy(() =>
-      z.object({ "@type": z.literal("BreadcrumbList") }).catchall(z.unknown()),
-    )
+    .union([
+      z.object({ "@id": z.string() }),
+      z.lazy(() =>
+        z.object({ "@type": z.literal("BreadcrumbList") }).catchall(z.unknown()),
+      ),
+    ])
     .optional(),
   lastReviewed: z.string().optional(),
   reviewedBy: PersonOrOrgRef.optional(),
@@ -42,12 +45,16 @@ export const WebPageSchema = CreativeWorkSchema.extend({
     .optional(),
   significantLink: z.union([z.url(), z.array(z.url())]).optional(),
   mainContentOfPage: z
-    .object({ "@type": z.string() })
-    .catchall(z.unknown())
+    .union([
+      z.object({ "@id": z.string() }),
+      z.object({ "@type": z.string() }).catchall(z.unknown()),
+    ])
     .optional(),
   primaryImageOfPage: z
-    .object({ "@type": z.string() })
-    .catchall(z.unknown())
+    .union([
+      z.object({ "@id": z.string() }),
+      z.object({ "@type": z.string() }).catchall(z.unknown()),
+    ])
     .optional(),
   relatedLink: z.union([z.url(), z.array(z.url())]).optional(),
 });

@@ -111,7 +111,10 @@ export const QuizSchema = CreativeWorkSchema.extend({
   name: z.string().optional(),
   educationalLevel: z.string().optional(),
   about: z
-    .lazy(() => z.object({ "@type": z.string() }).catchall(z.unknown()))
+    .union([
+      z.object({ "@id": z.string() }),
+      z.lazy(() => z.object({ "@type": z.string() }).catchall(z.unknown())),
+    ])
     .optional(),
   hasPart: z.array(QuestionSchema).optional(),
   educationalAlignment: z

@@ -32,8 +32,9 @@ export const ThingSchema = z.object({
   alternateName: z.string().optional(),
 
   // Relationships (loose refs to avoid circular type inference)
-  subjectOf: AnyThingRef.optional(),
-  mainEntityOfPage: z.union([z.url(), AnyThingRef]).optional(),
+  // All accept { "@id": "..." } for @graph cross-referencing
+  subjectOf: z.union([z.object({ "@id": z.string() }), AnyThingRef]).optional(),
+  mainEntityOfPage: z.union([z.url(), z.object({ "@id": z.string() }), AnyThingRef]).optional(),
 });
 
 export type Thing = z.infer<typeof ThingSchema>;

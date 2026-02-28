@@ -66,12 +66,16 @@ export const LocalBusinessSchema = PlaceSchema.extend({
   iso6523Code: z.string().optional(),
   hasMerchantReturnPolicy: MerchantReturnPolicySchema.optional(),
   sameAs: z.union([z.url(), z.array(z.url())]).optional(),
-  // Departments (nested LocalBusiness):
+  // Departments (nested LocalBusiness — accept @id refs for @graph cross-referencing):
   department: z
     .lazy(() =>
       z.union([
+        z.object({ "@id": z.string() }),
         z.object({ "@type": z.string() }).catchall(z.unknown()),
-        z.array(z.object({ "@type": z.string() }).catchall(z.unknown())),
+        z.array(z.union([
+          z.object({ "@id": z.string() }),
+          z.object({ "@type": z.string() }).catchall(z.unknown()),
+        ])),
       ]),
     )
     .optional(),

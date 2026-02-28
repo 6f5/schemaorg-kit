@@ -57,8 +57,9 @@ export const OrganizationSchema = extendThing("Organization", {
     .union([InteractionCounterSchema, z.array(InteractionCounterSchema)])
     .optional(),
   // Hierarchical organization (loose refs to avoid circular type inference):
-  subOrganization: NestedOrgRef.optional(),
-  parentOrganization: NestedOrgRef.optional(),
+  // Accept { "@id": "..." } for @graph cross-referencing
+  subOrganization: z.union([z.object({ "@id": z.string() }), NestedOrgRef]).optional(),
+  parentOrganization: z.union([z.object({ "@id": z.string() }), NestedOrgRef]).optional(),
   sameAs: z.union([z.url(), z.array(z.url())]).optional(),
 });
 

@@ -105,7 +105,10 @@ export const OfferSchema = z.object({
   validFrom: z.string().optional(), // ISO 8601
   validThrough: z.string().optional(), // ISO 8601
   url: z.url().optional(),
-  seller: z.object({ "@type": z.string(), name: z.string() }).optional(),
+  seller: z.union([
+    z.object({ "@id": z.string() }),
+    z.object({ "@type": z.string(), name: z.string() }),
+  ]).optional(),
   category: z.string().optional(),
   inventoryLevel: z
     .object({
@@ -124,7 +127,10 @@ export const OfferSchema = z.object({
     .union([OfferShippingDetailsSchema, z.array(OfferShippingDetailsSchema)])
     .optional(),
   hasMerchantReturnPolicy: z
-    .lazy(() => z.object({ "@type": z.string() }).catchall(z.unknown()))
+    .union([
+      z.object({ "@id": z.string() }),
+      z.lazy(() => z.object({ "@type": z.string() }).catchall(z.unknown())),
+    ])
     .optional(),
 });
 

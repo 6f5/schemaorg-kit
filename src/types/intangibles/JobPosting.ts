@@ -43,7 +43,7 @@ export const JobPostingSchema = z.object({
   // Required by Google:
   title: z.string(),
   description: z.string(),
-  hiringOrganization: HiringOrgRef,
+  hiringOrganization: z.union([z.object({ "@id": z.string() }), HiringOrgRef]),
   jobLocation: z.union([JobLocationRef, z.array(JobLocationRef)]).optional(),
   datePosted: z.string(), // ISO 8601 date
   // Recommended by Google:

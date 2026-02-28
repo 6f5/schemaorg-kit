@@ -43,11 +43,14 @@ export const DiscussionForumPostingSchema = CreativeWorkSchema.extend({
   /** "published", "draft", "deleted" — or a schema.org enum URL */
   creativeWorkStatus: z.string().optional(),
   mainEntityOfPage: z
-    .union([z.url(), z.object({}).catchall(z.unknown())])
+    .union([z.url(), z.object({ "@id": z.string() }), z.object({}).catchall(z.unknown())])
     .optional(),
-  // For reposts:
+  // For reposts (accept @id refs for @graph cross-referencing):
   sharedContent: z
-    .lazy(() => z.object({ "@type": z.string() }).catchall(z.unknown()))
+    .union([
+      z.object({ "@id": z.string() }),
+      z.lazy(() => z.object({ "@type": z.string() }).catchall(z.unknown())),
+    ])
     .optional(),
   interactionStatistic: z
     .union([InteractionCounterSchema, z.array(InteractionCounterSchema)])

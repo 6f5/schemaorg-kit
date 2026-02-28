@@ -42,7 +42,10 @@ export const ReviewSchema = z.object({
   publisher: PersonOrOrgRef.optional(),
   // itemReviewed: any Thing — kept loose to avoid circular imports
   itemReviewed: z
-    .lazy(() => z.object({ "@type": z.string() }).passthrough())
+    .union([
+      z.object({ "@id": z.string() }),
+      z.lazy(() => z.object({ "@type": z.string() }).catchall(z.unknown())),
+    ])
     .optional(),
   name: z.string().optional(), // Review headline
   url: z.url().optional(),
@@ -59,9 +62,12 @@ export const EmployerAggregateRatingSchema = AggregateRatingSchema.extend({
     .literal("EmployerAggregateRating")
     .default("EmployerAggregateRating"),
   itemReviewed: z
-    .lazy(() =>
-      z.object({ "@type": z.string(), name: z.string() }).passthrough(),
-    )
+    .union([
+      z.object({ "@id": z.string() }),
+      z.lazy(() =>
+        z.object({ "@type": z.string(), name: z.string() }).catchall(z.unknown()),
+      ),
+    ])
     .optional(),
 });
 

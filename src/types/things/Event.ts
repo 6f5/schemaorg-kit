@@ -35,6 +35,7 @@ export const EventAttendanceMode = z
 
 const PlaceRef = z.union([
   z.string(),
+  z.object({ "@id": z.string() }),
   z.object({
     "@type": z.literal("Place").default("Place"),
     name: z.string().optional(),
@@ -70,14 +71,20 @@ export const EventSchema = extendThing("Event", {
   description: z.string().optional(),
   previousStartDate: z.string().optional(), // ISO 8601 — for rescheduled events
   aggregateRating: AggregateRatingSchema.optional(),
-  // Sub-events:
+  // Sub-events (accept @id refs for @graph cross-referencing):
   subEvent: z
     .lazy(() =>
-      z.array(z.object({ "@type": z.string() }).catchall(z.unknown())),
+      z.array(z.union([
+        z.object({ "@id": z.string() }),
+        z.object({ "@type": z.string() }).catchall(z.unknown()),
+      ])),
     )
     .optional(),
   superEvent: z
-    .lazy(() => z.object({ "@type": z.string() }).catchall(z.unknown()))
+    .union([
+      z.object({ "@id": z.string() }),
+      z.lazy(() => z.object({ "@type": z.string() }).catchall(z.unknown())),
+    ])
     .optional(),
   // Additional:
   inLanguage: z

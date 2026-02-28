@@ -132,13 +132,16 @@ export const BookSchema = z.object({
   workExample: z
     .union([BookEditionSchema, z.array(BookEditionSchema)])
     .optional(),
-  /** Publisher of the primary edition */
+  /** Publisher of the primary edition (accept @id refs for @graph cross-referencing) */
   publisher: z
-    .object({
-      "@type": z.union([z.literal("Organization"), z.literal("Person")]),
-      name: z.string(),
-      url: z.url().optional(),
-    })
+    .union([
+      z.object({ "@id": z.string() }),
+      z.object({
+        "@type": z.union([z.literal("Organization"), z.literal("Person")]),
+        name: z.string(),
+        url: z.url().optional(),
+      }),
+    ])
     .optional(),
   /** Number of pages */
   numberOfPages: z.number().int().positive().optional(),
@@ -150,7 +153,10 @@ export const BookSchema = z.object({
   inLanguage: z.string().optional(),
   /** Aggregate rating across editions */
   aggregateRating: z
-    .lazy(() => z.object({ "@type": z.string() }).catchall(z.unknown()))
+    .union([
+      z.object({ "@id": z.string() }),
+      z.lazy(() => z.object({ "@type": z.string() }).catchall(z.unknown())),
+    ])
     .optional(),
 });
 

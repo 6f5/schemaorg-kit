@@ -10,13 +10,17 @@ import { WebPageSchema } from "../creative-works/WebPage";
  */
 export const ProfilePageSchema = WebPageSchema.extend({
   "@type": z.literal("ProfilePage").default("ProfilePage"),
-  // mainEntity: the person or org this profile is about (loose ref to avoid circular imports)
-  mainEntity: z.lazy(() =>
-    z.object({ "@type": z.string() }).catchall(z.unknown())
-  ).optional(),
+  // mainEntity: the person or org this profile is about (accept @id refs for @graph)
+  mainEntity: z.union([
+    z.object({ "@id": z.string() }),
+    z.lazy(() => z.object({ "@type": z.string() }).catchall(z.unknown())),
+  ]).optional(),
   // hasPart: content published by/about this profile subject
   hasPart: z.array(
-    z.lazy(() => z.object({ "@type": z.string() }).catchall(z.unknown()))
+    z.union([
+      z.object({ "@id": z.string() }),
+      z.lazy(() => z.object({ "@type": z.string() }).catchall(z.unknown())),
+    ])
   ).optional(),
   dateCreated: z.string().optional(),
   dateModified: z.string().optional(),

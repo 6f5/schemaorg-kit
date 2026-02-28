@@ -163,34 +163,55 @@ const graph = createGraph([
 
 ## Cross-Referencing with @id
 
-Use `@id` to reference the same entity in multiple places without repeating all its fields. The `SchemaIds` helper generates consistent IDs and `{ "@id": "..." }` reference objects:
+Use `@id` to reference the same entity in multiple places without repeating all its fields. The `SchemaIds` helper generates consistent IDs and `{ "@id": "..." }` reference objects.
+
+**All reference fields** accept `{ "@id": "..." }` objects — including `isPartOf`, `location`, `breadcrumb`, `mainEntity`, `publisher`, `seller`, `hiringOrganization`, `containedInPlace`, `department`, and more. No `as any` needed anywhere.
 
 ```ts
-import { SchemaIds, createGraph, createArticle, createOrganization } from 'schemaorg-kit';
+import {
+  SchemaIds, createGraph, createOrganization,
+  createWebSite, createWebPage, createArticle, createBreadcrumbList,
+} from 'schemaorg-kit';
 
 const ids = new SchemaIds('https://example.com');
 
-// Define Organization once with @id
-const org = createOrganization({
-  '@id': ids.organization(),
-  name: 'Example Corp',
-  url: 'https://example.com',
-  logo: 'https://example.com/logo.png',
-});
-
-// Reference it by @id in the Article — no "as any" needed
-const article = createArticle({
-  headline: 'Our Latest Innovation',
-  datePublished: '2025-05-01',
-  image: 'https://example.com/innovation.jpg',
-  author: ids.ref('organization'),
-  publisher: ids.ref('organization'),
-});
-
-const graph = createGraph([org, article]);
+const graph = createGraph([
+  createOrganization({
+    '@id': ids.organization(),
+    name: 'Example Corp',
+    url: 'https://example.com',
+    logo: 'https://example.com/logo.png',
+  }),
+  createWebSite({
+    '@id': ids.website(),
+    name: 'Example',
+    url: 'https://example.com',
+    publisher: ids.ref('organization'),
+  }),
+  createWebPage({
+    '@id': ids.webpage(),
+    url: 'https://example.com/blog/hello',
+    isPartOf: ids.ref('website'),
+    breadcrumb: ids.ref('breadcrumb'),
+  }),
+  createArticle({
+    headline: 'Our Latest Innovation',
+    datePublished: '2025-05-01',
+    image: 'https://example.com/innovation.jpg',
+    author: ids.ref('organization'),
+    publisher: ids.ref('organization'),
+    isPartOf: ids.ref('website'),
+    mainEntityOfPage: ids.ref('webpage'),
+  }),
+  createBreadcrumbList([
+    { name: 'Home', url: 'https://example.com' },
+    { name: 'Blog', url: 'https://example.com/blog' },
+    { name: 'Our Latest Innovation' },
+  ]),
+]);
 ```
 
-The `@graph` output will have the full organization definition once, and references to it by `@id` in the article.
+Every `@id` reference resolves to the full entity definition elsewhere in the `@graph`.
 
 ### SchemaIds API
 
@@ -212,7 +233,9 @@ ids.custom('contactpoint')   // "https://example.com/#contactpoint"
 // Page-scoped IDs
 ids.forPath('/about', 'webpage')  // "https://example.com/about#webpage"
 
-// Cross-reference objects for publisher, author, organizer, etc.
+// Cross-reference objects — works with all reference fields:
+// publisher, author, isPartOf, location, breadcrumb, mainEntity,
+// seller, hiringOrganization, department, containedInPlace, and more
 ids.ref('organization')  // { "@id": "https://example.com/#organization" }
 ```
 
