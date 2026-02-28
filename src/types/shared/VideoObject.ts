@@ -10,9 +10,9 @@ import { ImageOrUrl } from "./ImageObject";
 export const ClipSchema = z.object({
   "@type": z.literal("Clip").default("Clip"),
   name: z.string(),
-  startOffset: z.number(),             // seconds from start
-  endOffset: z.number().optional(),    // seconds from start
-  url: z.string().url().optional(),    // URL pointing to this clip
+  startOffset: z.number(), // seconds from start
+  endOffset: z.number().optional(), // seconds from start
+  url: z.url().optional(), // URL pointing to this clip
 });
 
 /**
@@ -22,7 +22,7 @@ export const ClipSchema = z.object({
 export const BroadcastEventSchema = z.object({
   "@type": z.literal("BroadcastEvent").default("BroadcastEvent"),
   isLiveBroadcast: z.boolean().optional(),
-  startDate: z.string().optional(),    // ISO 8601
+  startDate: z.string().optional(), // ISO 8601
   endDate: z.string().optional(),
 });
 
@@ -52,21 +52,25 @@ export const VideoObjectSchema = z.object({
   "@type": z.literal("VideoObject").default("VideoObject"),
   // Required by Google:
   name: z.string(),
-  thumbnailUrl: z.union([z.string().url(), z.array(z.string().url())]),
-  uploadDate: z.string(),              // ISO 8601 date
+  thumbnailUrl: z.union([z.url(), z.array(z.url())]),
+  uploadDate: z.string(), // ISO 8601 date
   // Recommended by Google:
   description: z.string().optional(),
-  duration: z.string().optional(),     // ISO 8601 duration, e.g. "PT1M54S"
-  contentUrl: z.string().url().optional(),
-  embedUrl: z.string().url().optional(),
+  duration: z.string().optional(), // ISO 8601 duration, e.g. "PT1M54S"
+  contentUrl: z.url().optional(),
+  embedUrl: z.url().optional(),
   // Optional:
-  expires: z.string().optional(),      // ISO 8601 — when video is no longer available
+  expires: z.string().optional(), // ISO 8601 — when video is no longer available
   hasPart: z.array(ClipSchema).optional(),
-  interactionStatistic: z.object({
-    "@type": z.literal("InteractionCounter").default("InteractionCounter"),
-    interactionType: z.literal("https://schema.org/WatchAction").default("https://schema.org/WatchAction"),
-    userInteractionCount: z.number().int().nonnegative(),
-  }).optional(),
+  interactionStatistic: z
+    .object({
+      "@type": z.literal("InteractionCounter").default("InteractionCounter"),
+      interactionType: z
+        .literal("https://schema.org/WatchAction")
+        .default("https://schema.org/WatchAction"),
+      userInteractionCount: z.number().int().nonnegative(),
+    })
+    .optional(),
   regionsAllowed: z.union([z.string(), z.array(z.string())]).optional(),
   ineligibleRegion: z.union([z.string(), z.array(z.string())]).optional(),
   requiresSubscription: z.boolean().optional(),

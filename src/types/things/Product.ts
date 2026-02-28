@@ -1,7 +1,11 @@
 import { z } from "zod";
 import { extendThing } from "./Thing";
 import { makeFactory } from "../../core/base";
-import { OfferSchema, AggregateOfferSchema, MerchantReturnPolicySchema } from "../shared/Offer";
+import {
+  OfferSchema,
+  AggregateOfferSchema,
+  MerchantReturnPolicySchema,
+} from "../shared/Offer";
 import { AggregateRatingSchema, ReviewSchema } from "../shared/Rating";
 import { ImageOrUrl } from "../shared/ImageObject";
 
@@ -16,12 +20,14 @@ import { ImageOrUrl } from "../shared/ImageObject";
 export const CertificationSchema = z.object({
   "@type": z.literal("Certification").default("Certification"),
   name: z.string(),
-  url: z.string().url().optional(),
-  issuedBy: z.object({
-    "@type": z.literal("Organization").default("Organization"),
-    name: z.string(),
-    url: z.string().url().optional(),
-  }).optional(),
+  url: z.url().optional(),
+  issuedBy: z
+    .object({
+      "@type": z.literal("Organization").default("Organization"),
+      name: z.string(),
+      url: z.url().optional(),
+    })
+    .optional(),
   certificationRatingValue: z.string().optional(),
   certificationStatus: z.string().optional(),
   validFrom: z.string().optional(),
@@ -39,7 +45,7 @@ export type Certification = z.infer<typeof CertificationSchema>;
  */
 export const ThreeDModelSchema = z.object({
   "@type": z.literal("3DModel").default("3DModel"),
-  contentUrl: z.string().url(),
+  contentUrl: z.url(),
   /** MIME type, e.g. "model/gltf-binary", "model/gltf+json" */
   encodingFormat: z.string().optional(),
   name: z.string().optional(),
@@ -47,10 +53,10 @@ export const ThreeDModelSchema = z.object({
 
 // Loose refs for mutual circular relationship between Product and ProductGroup
 const LooseProductRef = z.lazy(() =>
-  z.object({ "@type": z.string() }).catchall(z.unknown())
+  z.object({ "@type": z.string() }).catchall(z.unknown()),
 );
 const LooseProductGroupRef = z.lazy(() =>
-  z.object({ "@type": z.string() }).catchall(z.unknown())
+  z.object({ "@type": z.string() }).catchall(z.unknown()),
 );
 
 // ─── SizeSpecification ───────────────────────────────────────────────────────
@@ -86,36 +92,46 @@ export const ProductSchema = extendThing("Product", {
   gtin12: z.string().optional(),
   gtin13: z.string().optional(),
   gtin14: z.string().optional(),
-  mpn: z.string().optional(),                    // Manufacturer Part Number
-  brand: z.union([
-    z.string(),
-    z.object({
-      "@type": z.union([z.literal("Brand"), z.literal("Organization")]),
-      name: z.string(),
-    }),
-  ]).optional(),
-  offers: z.union([
-    OfferSchema,
-    AggregateOfferSchema,
-    z.array(z.union([OfferSchema, AggregateOfferSchema])),
-  ]).optional(),
+  mpn: z.string().optional(), // Manufacturer Part Number
+  brand: z
+    .union([
+      z.string(),
+      z.object({
+        "@type": z.union([z.literal("Brand"), z.literal("Organization")]),
+        name: z.string(),
+      }),
+    ])
+    .optional(),
+  offers: z
+    .union([
+      OfferSchema,
+      AggregateOfferSchema,
+      z.array(z.union([OfferSchema, AggregateOfferSchema])),
+    ])
+    .optional(),
   aggregateRating: AggregateRatingSchema.optional(),
   review: z.union([ReviewSchema, z.array(ReviewSchema)]).optional(),
   category: z.string().optional(),
   color: z.string().optional(),
   material: z.string().optional(),
-  weight: z.object({
-    "@type": z.literal("QuantitativeValue").default("QuantitativeValue"),
-    value: z.number(),
-    unitCode: z.string(),
-  }).optional(),
+  weight: z
+    .object({
+      "@type": z.literal("QuantitativeValue").default("QuantitativeValue"),
+      value: z.number(),
+      unitCode: z.string(),
+    })
+    .optional(),
   image: z.union([ImageOrUrl, z.array(ImageOrUrl)]).optional(),
   hasMerchantReturnPolicy: MerchantReturnPolicySchema.optional(),
   isVariantOf: LooseProductGroupRef.optional(),
   /** Certifications (CE, Energy Star, Fair Trade, etc.) */
-  hasCertification: z.union([CertificationSchema, z.array(CertificationSchema)]).optional(),
+  hasCertification: z
+    .union([CertificationSchema, z.array(CertificationSchema)])
+    .optional(),
   /** 3D models for interactive product views in Google Search/Images */
-  subjectOf: z.union([ThreeDModelSchema, z.array(ThreeDModelSchema)]).optional(),
+  subjectOf: z
+    .union([ThreeDModelSchema, z.array(ThreeDModelSchema)])
+    .optional(),
   /** Pattern design, e.g. "Polka dots", "Stripes" */
   pattern: z.string().optional(),
   /** Size as a string or structured SizeSpecification */
@@ -131,7 +147,7 @@ export const ProductSchema = extendThing("Product", {
           "@type": z.literal("ListItem").default("ListItem"),
           position: z.number().int().positive(),
           name: z.string(),
-        })
+        }),
       ),
     })
     .optional(),
@@ -144,7 +160,7 @@ export const ProductSchema = extendThing("Product", {
           "@type": z.literal("ListItem").default("ListItem"),
           position: z.number().int().positive(),
           name: z.string(),
-        })
+        }),
       ),
     })
     .optional(),
@@ -162,13 +178,15 @@ export const ProductGroupSchema = extendThing("ProductGroup", {
   productGroupID: z.string().optional(),
   sku: z.string().optional(),
   gtin: z.string().optional(),
-  brand: z.union([
-    z.string(),
-    z.object({
-      "@type": z.union([z.literal("Brand"), z.literal("Organization")]),
-      name: z.string(),
-    }),
-  ]).optional(),
+  brand: z
+    .union([
+      z.string(),
+      z.object({
+        "@type": z.union([z.literal("Brand"), z.literal("Organization")]),
+        name: z.string(),
+      }),
+    ])
+    .optional(),
   offers: z.union([OfferSchema, z.array(OfferSchema)]).optional(),
   aggregateRating: AggregateRatingSchema.optional(),
   review: z.union([ReviewSchema, z.array(ReviewSchema)]).optional(),
@@ -181,9 +199,17 @@ export type ProductGroup = z.infer<typeof ProductGroupSchema>;
 export type ThreeDModel = z.infer<typeof ThreeDModelSchema>;
 
 // Re-export shared types for backward compatibility
-export { OfferSchema, AggregateOfferSchema, MerchantReturnPolicySchema } from "../shared/Offer";
+export {
+  OfferSchema,
+  AggregateOfferSchema,
+  MerchantReturnPolicySchema,
+} from "../shared/Offer";
 export { AggregateRatingSchema } from "../shared/Rating";
-export type { Offer, AggregateOffer, MerchantReturnPolicy } from "../shared/Offer";
+export type {
+  Offer,
+  AggregateOffer,
+  MerchantReturnPolicy,
+} from "../shared/Offer";
 export type { AggregateRating } from "../shared/Rating";
 
 export const createProduct = makeFactory(ProductSchema);

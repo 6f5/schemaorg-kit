@@ -8,16 +8,22 @@ import { CreativeWorkSchema } from "./CreativeWork";
  */
 export const SolveMathActionSchema = z.object({
   "@type": z.literal("SolveMathAction").default("SolveMathAction"),
-  eduQuestionType: z.string().optional(),        // e.g. "Algebra", "Calculus"
+  eduQuestionType: z.string().optional(), // e.g. "Algebra", "Calculus"
   mathExpression: z.string().optional(),
-  target: z.object({
-    "@type": z.literal("EntryPoint").default("EntryPoint"),
-    urlTemplate: z.string().optional(),
-    actionAccessibilityRequirement: z.object({
-      "@type": z.literal("ActionAccessSpecification").default("ActionAccessSpecification"),
-      requiresSubscription: z.boolean().optional(),
-    }).optional(),
-  }).optional(),
+  target: z
+    .object({
+      "@type": z.literal("EntryPoint").default("EntryPoint"),
+      urlTemplate: z.string().optional(),
+      actionAccessibilityRequirement: z
+        .object({
+          "@type": z
+            .literal("ActionAccessSpecification")
+            .default("ActionAccessSpecification"),
+          requiresSubscription: z.boolean().optional(),
+        })
+        .optional(),
+    })
+    .optional(),
 });
 
 /**
@@ -28,13 +34,15 @@ export const SolveMathActionSchema = z.object({
 export const MathSolverSchema = CreativeWorkSchema.extend({
   "@type": z.literal("MathSolver").default("MathSolver"),
   name: z.string(),
-  url: z.string().url().optional(),
-  potentialAction: z.union([SolveMathActionSchema, z.array(SolveMathActionSchema)]).optional(),
+  url: z.url().optional(),
+  potentialAction: z
+    .union([SolveMathActionSchema, z.array(SolveMathActionSchema)])
+    .optional(),
   mathExpression: z.union([z.string(), z.array(z.string())]).optional(),
   educationalLevel: z.string().optional(),
   teaches: z.union([z.string(), z.array(z.string())]).optional(),
   /** URL of a page describing usage/terms for the solver — Google required field */
-  usageInfo: z.string().url().optional(),
+  usageInfo: z.url().optional(),
   /** Learning resource type — defaults to "Math Solver" per Google spec */
   learningResourceType: z.string().default("Math Solver"),
   /** Topics the solver assesses */

@@ -7,28 +7,32 @@ import { MonetaryAmountSchema } from "./MonetaryAmount";
  * Item availability enum.
  * Values are transformed to full schema.org URLs on output.
  */
-export const ItemAvailability = z.enum([
-  "InStock",
-  "OutOfStock",
-  "PreOrder",
-  "Discontinued",
-  "LimitedAvailability",
-  "SoldOut",
-  "OnlineOnly",
-  "InStoreOnly",
-  "BackOrder",
-]).transform((v) => `https://schema.org/${v}`);
+export const ItemAvailability = z
+  .enum([
+    "InStock",
+    "OutOfStock",
+    "PreOrder",
+    "Discontinued",
+    "LimitedAvailability",
+    "SoldOut",
+    "OnlineOnly",
+    "InStoreOnly",
+    "BackOrder",
+  ])
+  .transform((v) => `https://schema.org/${v}`);
 
 /**
  * Item condition enum.
  * Values are transformed to full schema.org URLs on output.
  */
-export const ItemCondition = z.enum([
-  "NewCondition",
-  "UsedCondition",
-  "RefurbishedCondition",
-  "DamagedCondition",
-]).transform((v) => `https://schema.org/${v}`);
+export const ItemCondition = z
+  .enum([
+    "NewCondition",
+    "UsedCondition",
+    "RefurbishedCondition",
+    "DamagedCondition",
+  ])
+  .transform((v) => `https://schema.org/${v}`);
 
 // ─── UnitPriceSpecification ──────────────────────────────────────────────────
 
@@ -41,7 +45,7 @@ export const UnitPriceSpecificationSchema = z.object({
     .literal("UnitPriceSpecification")
     .default("UnitPriceSpecification"),
   price: z.union([z.number(), z.string()]),
-  priceCurrency: z.string().length(3),           // ISO 4217
+  priceCurrency: z.string().length(3), // ISO 4217
   /** "SRP", "ListPrice", "MinimumAdvertisedPrice", "SalePrice", "InvoicePrice" */
   priceType: z.string().optional(),
   /** Member tier this price is valid for */
@@ -68,7 +72,9 @@ export const UnitPriceSpecificationSchema = z.object({
   validThrough: z.string().optional(),
 });
 
-export type UnitPriceSpecification = z.infer<typeof UnitPriceSpecificationSchema>;
+export type UnitPriceSpecification = z.infer<
+  typeof UnitPriceSpecificationSchema
+>;
 
 // ─── MerchantReturnPolicySeasonalOverride ─────────────────────────────────────
 
@@ -76,9 +82,9 @@ export const MerchantReturnPolicySeasonalOverrideSchema = z.object({
   "@type": z
     .literal("MerchantReturnPolicySeasonalOverride")
     .default("MerchantReturnPolicySeasonalOverride"),
-  startDate: z.string().optional(),             // ISO 8601
-  endDate: z.string().optional(),               // ISO 8601
-  returnPolicyCategory: z.string().optional(),  // schema.org enum URL
+  startDate: z.string().optional(), // ISO 8601
+  endDate: z.string().optional(), // ISO 8601
+  returnPolicyCategory: z.string().optional(), // schema.org enum URL
   merchantReturnDays: z.number().int().nonnegative().optional(),
 });
 
@@ -93,32 +99,33 @@ export type MerchantReturnPolicySeasonalOverride = z.infer<
 export const OfferSchema = z.object({
   "@type": z.literal("Offer").default("Offer"),
   price: z.union([z.number(), z.string()]),
-  priceCurrency: z.string().length(3),           // ISO 4217, e.g. "USD"
+  priceCurrency: z.string().length(3), // ISO 4217, e.g. "USD"
   availability: ItemAvailability.optional(),
   itemCondition: ItemCondition.optional(),
-  validFrom: z.string().optional(),              // ISO 8601
-  validThrough: z.string().optional(),           // ISO 8601
-  url: z.string().url().optional(),
+  validFrom: z.string().optional(), // ISO 8601
+  validThrough: z.string().optional(), // ISO 8601
+  url: z.url().optional(),
   seller: z.object({ "@type": z.string(), name: z.string() }).optional(),
   category: z.string().optional(),
-  inventoryLevel: z.object({
-    "@type": z.literal("QuantitativeValue").default("QuantitativeValue"),
-    value: z.number(),
-  }).optional(),
-  priceValidUntil: z.string().optional(),        // ISO 8601 date — Google Product requirement
+  inventoryLevel: z
+    .object({
+      "@type": z.literal("QuantitativeValue").default("QuantitativeValue"),
+      value: z.number(),
+    })
+    .optional(),
+  priceValidUntil: z.string().optional(), // ISO 8601 date — Google Product requirement
   priceSpecification: z
     .union([
       UnitPriceSpecificationSchema,
       z.array(UnitPriceSpecificationSchema),
     ])
     .optional(),
-  shippingDetails: z.union([
-    OfferShippingDetailsSchema,
-    z.array(OfferShippingDetailsSchema),
-  ]).optional(),
-  hasMerchantReturnPolicy: z.lazy(() =>
-    z.object({ "@type": z.string() }).catchall(z.unknown())
-  ).optional(),
+  shippingDetails: z
+    .union([OfferShippingDetailsSchema, z.array(OfferShippingDetailsSchema)])
+    .optional(),
+  hasMerchantReturnPolicy: z
+    .lazy(() => z.object({ "@type": z.string() }).catchall(z.unknown()))
+    .optional(),
 });
 
 /**
@@ -128,23 +135,19 @@ export const OfferSchema = z.object({
 export const MerchantReturnPolicySchema = z.object({
   "@type": z.literal("MerchantReturnPolicy").default("MerchantReturnPolicy"),
   applicableCountry: z.union([z.string(), z.array(z.string())]).optional(),
-  returnPolicyCategory: z.string().optional(),    // schema.org enum URL
+  returnPolicyCategory: z.string().optional(), // schema.org enum URL
   merchantReturnDays: z.number().int().nonnegative().optional(),
-  returnMethod: z.string().optional(),            // schema.org enum URL
-  returnFees: z.string().optional(),              // schema.org enum URL
-  refundType: z.string().optional(),              // schema.org enum URL
+  returnMethod: z.string().optional(), // schema.org enum URL
+  returnFees: z.string().optional(), // schema.org enum URL
+  refundType: z.string().optional(), // schema.org enum URL
 
   // Additional Google Merchant Listing fields
-  merchantReturnLink: z.string().url().optional(),
+  merchantReturnLink: z.url().optional(),
   returnShippingFeesAmount: MonetaryAmountSchema.optional(),
-  itemCondition: z
-    .union([ItemCondition, z.array(ItemCondition)])
-    .optional(),
-  returnLabelSource: z.string().optional(),       // schema.org enum URL
-  returnPolicyCountry: z.string().optional(),     // ISO 3166-1 alpha-2
-  restockingFee: z
-    .union([MonetaryAmountSchema, z.number()])
-    .optional(),
+  itemCondition: z.union([ItemCondition, z.array(ItemCondition)]).optional(),
+  returnLabelSource: z.string().optional(), // schema.org enum URL
+  returnPolicyCountry: z.string().optional(), // ISO 3166-1 alpha-2
+  restockingFee: z.union([MonetaryAmountSchema, z.number()]).optional(),
   returnPolicySeasonalOverride: z
     .union([
       MerchantReturnPolicySeasonalOverrideSchema,
@@ -153,13 +156,13 @@ export const MerchantReturnPolicySchema = z.object({
     .optional(),
 
   // Customer remorse return fields
-  customerRemorseReturnFees: z.string().optional(),       // schema.org enum URL
+  customerRemorseReturnFees: z.string().optional(), // schema.org enum URL
   customerRemorseReturnLabelSource: z.string().optional(), // schema.org enum URL
   customerRemorseReturnShippingFeesAmount: MonetaryAmountSchema.optional(),
 
   // Item defect return fields
-  itemDefectReturnFees: z.string().optional(),            // schema.org enum URL
-  itemDefectReturnLabelSource: z.string().optional(),     // schema.org enum URL
+  itemDefectReturnFees: z.string().optional(), // schema.org enum URL
+  itemDefectReturnLabelSource: z.string().optional(), // schema.org enum URL
   itemDefectReturnShippingFeesAmount: MonetaryAmountSchema.optional(),
 });
 
@@ -177,11 +180,11 @@ export const AggregateOfferSchema = z.object({
   "@type": z.literal("AggregateOffer").default("AggregateOffer"),
   lowPrice: z.number().optional(),
   highPrice: z.number().optional(),
-  priceCurrency: z.string().length(3).optional(),   // ISO 4217
+  priceCurrency: z.string().length(3).optional(), // ISO 4217
   offerCount: z.number().int().nonnegative().optional(),
   offers: z.union([OfferSchema, z.array(OfferSchema)]).optional(),
   availability: ItemAvailability.optional(),
-  url: z.string().url().optional(),
+  url: z.url().optional(),
 });
 
 export type AggregateOffer = z.infer<typeof AggregateOfferSchema>;

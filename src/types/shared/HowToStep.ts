@@ -7,9 +7,9 @@ import { ImageOrUrl } from "./ImageObject";
  */
 export const HowToStepSchema = z.object({
   "@type": z.literal("HowToStep").default("HowToStep"),
-  name: z.string().optional(),       // Step title (avoid "Step 1" format per Google)
-  text: z.string(),                  // Step description
-  url: z.string().url().optional(),  // Anchor link to step
+  name: z.string().optional(), // Step title (avoid "Step 1" format per Google)
+  text: z.string(), // Step description
+  url: z.url().optional(), // Anchor link to step
   image: ImageOrUrl.optional(),
 });
 

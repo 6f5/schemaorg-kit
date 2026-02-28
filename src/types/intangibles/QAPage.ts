@@ -17,7 +17,7 @@ export const AlignmentObjectSchema = z.object({
   alignmentType: z.string(),
   targetName: z.string(),
   educationalFramework: z.string().optional(),
-  targetUrl: z.string().url().optional(),
+  targetUrl: z.url().optional(),
   targetDescription: z.string().optional(),
 });
 
@@ -33,19 +33,23 @@ export type AlignmentObject = z.infer<typeof AlignmentObjectSchema>;
 export const AnswerSchema = z.object({
   "@type": z.literal("Answer").default("Answer"),
   text: z.string(),
-  dateCreated: z.string().optional(),            // ISO 8601
-  dateModified: z.string().optional(),           // ISO 8601
+  dateCreated: z.string().optional(), // ISO 8601
+  dateModified: z.string().optional(), // ISO 8601
   upvoteCount: z.number().int().nonnegative().optional(),
-  url: z.string().url().optional(),
+  url: z.url().optional(),
   author: PersonOrOrgRef.optional(),
   image: z.union([ImageOrUrl, z.array(ImageOrUrl)]).optional(),
   video: z.union([VideoObjectSchema, z.array(VideoObjectSchema)]).optional(),
-  comment: z.array(z.object({
-    "@type": z.literal("Comment").default("Comment"),
-    text: z.string(),
-    author: PersonOrOrgRef.optional(),
-    datePublished: z.string().optional(),
-  })).optional(),
+  comment: z
+    .array(
+      z.object({
+        "@type": z.literal("Comment").default("Comment"),
+        text: z.string(),
+        author: PersonOrOrgRef.optional(),
+        datePublished: z.string().optional(),
+      }),
+    )
+    .optional(),
 });
 
 // ─── Question ────────────────────────────────────────────────────────────────
@@ -56,8 +60,8 @@ export const AnswerSchema = z.object({
  */
 export const QuestionSchema = z.object({
   "@type": z.literal("Question").default("Question"),
-  name: z.string(),                              // The question text (also used as headline)
-  text: z.string().optional(),                   // Extended question text
+  name: z.string(), // The question text (also used as headline)
+  text: z.string().optional(), // Extended question text
   acceptedAnswer: z.union([AnswerSchema, z.array(AnswerSchema)]).optional(),
   suggestedAnswer: z.union([AnswerSchema, z.array(AnswerSchema)]).optional(),
   answerCount: z.number().int().nonnegative().optional(),
@@ -65,8 +69,8 @@ export const QuestionSchema = z.object({
   author: PersonOrOrgRef.optional(),
   dateCreated: z.string().optional(),
   datePublished: z.string().optional(),
-  dateModified: z.string().optional(),           // ISO 8601
-  url: z.string().url().optional(),
+  dateModified: z.string().optional(), // ISO 8601
+  url: z.url().optional(),
   image: z.union([ImageOrUrl, z.array(ImageOrUrl)]).optional(),
   video: z.union([VideoObjectSchema, z.array(VideoObjectSchema)]).optional(),
   /** Education Q&A question type, e.g. "Flashcard", "Problem Set" */
@@ -106,9 +110,9 @@ export const QuizSchema = CreativeWorkSchema.extend({
   "@type": z.literal("Quiz").default("Quiz"),
   name: z.string().optional(),
   educationalLevel: z.string().optional(),
-  about: z.lazy(() =>
-    z.object({ "@type": z.string() }).catchall(z.unknown())
-  ).optional(),
+  about: z
+    .lazy(() => z.object({ "@type": z.string() }).catchall(z.unknown()))
+    .optional(),
   hasPart: z.array(QuestionSchema).optional(),
   educationalAlignment: z
     .union([AlignmentObjectSchema, z.array(AlignmentObjectSchema)])

@@ -46,12 +46,9 @@ export const BorrowActionSchema = z.object({
   "@type": z.literal("BorrowAction").default("BorrowAction"),
   /** Library system or library lending this book */
   lender: z.object({
-    "@type": z.union([
-      z.literal("LibrarySystem"),
-      z.literal("Library"),
-    ]),
+    "@type": z.union([z.literal("LibrarySystem"), z.literal("Library")]),
     name: z.string(),
-    url: z.string().url().optional(),
+    url: z.url().optional(),
     /** Unique identifier for the library system */
     "@id": z.string().optional(),
   }),
@@ -87,15 +84,17 @@ export const BookEditionSchema = z.object({
   /** Publication date for this edition */
   datePublished: z.string().optional(),
   /** Landing page for this edition */
-  url: z.string().url().optional(),
+  url: z.url().optional(),
   /** Authors of this edition (may differ from work author) */
   author: z.union([PersonOrOrgRef, z.array(PersonOrOrgRef)]).optional(),
   /** ReadAction or BorrowAction for Google Book Actions */
-  potentialAction: z.union([
-    ReadActionSchema,
-    BorrowActionSchema,
-    z.array(z.union([ReadActionSchema, BorrowActionSchema])),
-  ]).optional(),
+  potentialAction: z
+    .union([
+      ReadActionSchema,
+      BorrowActionSchema,
+      z.array(z.union([ReadActionSchema, BorrowActionSchema])),
+    ])
+    .optional(),
   /** Offer — purchase price */
   offers: z.union([OfferSchema, z.array(OfferSchema)]).optional(),
 });
@@ -121,7 +120,7 @@ export const BookSchema = z.object({
   /** Primary author(s) of the work */
   author: z.union([PersonOrOrgRef, z.array(PersonOrOrgRef)]),
   /** Canonical URL for the book's landing page */
-  url: z.string().url().optional(),
+  url: z.url().optional(),
   /** Cover image */
   image: z.union([ImageOrUrl, z.array(ImageOrUrl)]).optional(),
   description: z.string().optional(),
@@ -130,13 +129,17 @@ export const BookSchema = z.object({
   /** Same-as links (e.g., Open Library, WorldCat) */
   sameAs: z.union([z.string(), z.array(z.string())]).optional(),
   /** Specific editions — each may have ReadAction / BorrowAction */
-  workExample: z.union([BookEditionSchema, z.array(BookEditionSchema)]).optional(),
+  workExample: z
+    .union([BookEditionSchema, z.array(BookEditionSchema)])
+    .optional(),
   /** Publisher of the primary edition */
-  publisher: z.object({
-    "@type": z.union([z.literal("Organization"), z.literal("Person")]),
-    name: z.string(),
-    url: z.string().url().optional(),
-  }).optional(),
+  publisher: z
+    .object({
+      "@type": z.union([z.literal("Organization"), z.literal("Person")]),
+      name: z.string(),
+      url: z.url().optional(),
+    })
+    .optional(),
   /** Number of pages */
   numberOfPages: z.number().int().positive().optional(),
   /** Original publication year */
@@ -146,9 +149,9 @@ export const BookSchema = z.object({
   /** BCP 47 language tag */
   inLanguage: z.string().optional(),
   /** Aggregate rating across editions */
-  aggregateRating: z.lazy(() =>
-    z.object({ "@type": z.string() }).catchall(z.unknown())
-  ).optional(),
+  aggregateRating: z
+    .lazy(() => z.object({ "@type": z.string() }).catchall(z.unknown()))
+    .optional(),
 });
 
 export type Book = z.infer<typeof BookSchema>;

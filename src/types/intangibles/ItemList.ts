@@ -8,12 +8,12 @@ import { makeFactory } from "../../core/base";
 export const ListItemSchema = z.object({
   "@type": z.literal("ListItem").default("ListItem"),
   position: z.number().int().positive(),
-  url: z.string().url().optional(),
+  url: z.url().optional(),
   name: z.string().optional(),
   // item: the actual entity being listed (loose ref to any schema node)
-  item: z.lazy(() =>
-    z.object({ "@type": z.string() }).catchall(z.unknown())
-  ).optional(),
+  item: z
+    .lazy(() => z.object({ "@type": z.string() }).catchall(z.unknown()))
+    .optional(),
 });
 
 /**
@@ -25,8 +25,9 @@ export const ItemListSchema = z.object({
   "@type": z.literal("ItemList").default("ItemList"),
   name: z.string().optional(),
   description: z.string().optional(),
-  url: z.string().url().optional(),
-  itemListOrder: z.enum(["Ascending", "Descending", "Unordered"])
+  url: z.url().optional(),
+  itemListOrder: z
+    .enum(["Ascending", "Descending", "Unordered"])
     .transform((v) => `https://schema.org/ItemListOrder${v}`)
     .optional(),
   numberOfItems: z.number().int().nonnegative().optional(),
@@ -34,7 +35,7 @@ export const ItemListSchema = z.object({
     z.union([
       ListItemSchema,
       z.object({ "@type": z.string() }).catchall(z.unknown()),
-    ])
+    ]),
   ),
 });
 

@@ -8,8 +8,8 @@ const BreadcrumbListSchema = z.object({
       "@type": z.literal("ListItem").default("ListItem"),
       position: z.number().int().positive(),
       name: z.string(),
-      item: z.string().url().optional(),
-    })
+      item: z.url().optional(),
+    }),
   ),
 });
 
@@ -31,7 +31,9 @@ type BreadcrumbInput = {
  *   { name: "Running Shoes" }, // last item — url optional
  * ])
  */
-export function createBreadcrumbList(items: BreadcrumbInput[]): SchemaNode<typeof BreadcrumbListSchema.shape> {
+export function createBreadcrumbList(
+  items: BreadcrumbInput[],
+): SchemaNode<typeof BreadcrumbListSchema.shape> {
   const data = BreadcrumbListSchema.parse({
     itemListElement: items.map((item, index) => ({
       "@type": "ListItem",

@@ -11,11 +11,9 @@ export const ClaimSchema = z.object({
   /** ISO 8601 date the claim was made */
   datePublished: z.string().optional(),
   /** URL of the first appearance of the claim */
-  firstAppearance: z.string().url().optional(),
+  firstAppearance: z.url().optional(),
   /** URL(s) of other appearances of the claim */
-  appearance: z
-    .union([z.string().url(), z.array(z.string().url())])
-    .optional(),
+  appearance: z.union([z.url(), z.array(z.url())]).optional(),
 });
 
 export type Claim = z.infer<typeof ClaimSchema>;
@@ -25,7 +23,7 @@ export type Claim = z.infer<typeof ClaimSchema>;
 export const ClaimReviewSchema = z.object({
   "@type": z.literal("ClaimReview").default("ClaimReview"),
   /** Canonical URL of the fact-check article */
-  url: z.string().url(),
+  url: z.url(),
   /** The text of the claim being evaluated */
   claimReviewed: z.string(),
   /** The rating given by the fact-checker */
@@ -42,7 +40,7 @@ export const ClaimReviewSchema = z.object({
     /** Name of the rating scale */
     name: z.string().optional(),
     /** URL of the rating explanation page */
-    image: z.string().url().optional(),
+    image: z.url().optional(),
   }),
   /** The fact-checking author / organization */
   author: z.union([PersonOrOrgRef, z.array(PersonOrOrgRef)]).optional(),
