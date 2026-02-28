@@ -1,6 +1,6 @@
 {
   "name": "schemaorg-kit",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Type-safe schema.org structured data builder — all Google rich result types, Zod validation, JSON-LD @graph",
   "keywords": [
     "schema.org",
