@@ -19,11 +19,13 @@ export const EmploymentType = z.enum([
 ]);
 
 const HiringOrgRef = z.object({
-  "@type": z.union([z.literal("Organization"), z.literal("LocalBusiness")]).default("Organization"),
+  "@type": z
+    .union([z.literal("Organization"), z.literal("LocalBusiness")])
+    .default("Organization"),
   name: z.string(),
-  sameAs: z.string().url().optional(),
+  sameAs: z.url().optional(),
   logo: ImageOrUrl.optional(),
-  url: z.string().url().optional(),
+  url: z.url().optional(),
 });
 
 const JobLocationRef = z.object({
@@ -43,46 +45,58 @@ export const JobPostingSchema = z.object({
   description: z.string(),
   hiringOrganization: HiringOrgRef,
   jobLocation: z.union([JobLocationRef, z.array(JobLocationRef)]).optional(),
-  datePosted: z.string(),                        // ISO 8601 date
+  datePosted: z.string(), // ISO 8601 date
   // Recommended by Google:
-  validThrough: z.string().optional(),           // ISO 8601 datetime
+  validThrough: z.string().optional(), // ISO 8601 datetime
   employmentType: z.union([EmploymentType, z.array(EmploymentType)]).optional(),
   baseSalary: MonetaryAmountSchema.optional(),
-  jobLocationType: z.string().optional(),        // "TELECOMMUTE" for remote
-  applicantLocationRequirements: z.union([
-    z.object({ "@type": z.string(), name: z.string() }),
-    z.array(z.object({ "@type": z.string(), name: z.string() })),
-  ]).optional(),
+  jobLocationType: z.string().optional(), // "TELECOMMUTE" for remote
+  applicantLocationRequirements: z
+    .union([
+      z.object({ "@type": z.string(), name: z.string() }),
+      z.array(z.object({ "@type": z.string(), name: z.string() })),
+    ])
+    .optional(),
   directApply: z.boolean().optional(),
   // Optional:
-  identifier: z.object({
-    "@type": z.literal("PropertyValue").default("PropertyValue"),
-    name: z.string().optional(),
-    value: z.union([z.string(), z.number()]),
-  }).optional(),
-  experienceRequirements: z.union([
-    z.string(),
-    z.object({
-      "@type": z.literal("OccupationalExperienceRequirements").default("OccupationalExperienceRequirements"),
-      monthsOfExperience: z.number(),
-    }),
-  ]).optional(),
-  educationRequirements: z.union([
-    z.string(),
-    z.object({
-      "@type": z.literal("EducationalOccupationalCredential").default("EducationalOccupationalCredential"),
-      credentialCategory: z.string(),            // e.g. "bachelor degree", "high school"
-    }),
-  ]).optional(),
+  identifier: z
+    .object({
+      "@type": z.literal("PropertyValue").default("PropertyValue"),
+      name: z.string().optional(),
+      value: z.union([z.string(), z.number()]),
+    })
+    .optional(),
+  experienceRequirements: z
+    .union([
+      z.string(),
+      z.object({
+        "@type": z
+          .literal("OccupationalExperienceRequirements")
+          .default("OccupationalExperienceRequirements"),
+        monthsOfExperience: z.number(),
+      }),
+    ])
+    .optional(),
+  educationRequirements: z
+    .union([
+      z.string(),
+      z.object({
+        "@type": z
+          .literal("EducationalOccupationalCredential")
+          .default("EducationalOccupationalCredential"),
+        credentialCategory: z.string(), // e.g. "bachelor degree", "high school"
+      }),
+    ])
+    .optional(),
   experienceInPlaceOfEducation: z.boolean().optional(),
   qualifications: z.string().optional(),
   responsibilities: z.string().optional(),
   skills: z.union([z.string(), z.array(z.string())]).optional(),
   industry: z.string().optional(),
-  occupationalCategory: z.string().optional(),   // O*NET-SOC codes
+  occupationalCategory: z.string().optional(), // O*NET-SOC codes
   workHours: z.string().optional(),
-  url: z.string().url().optional(),
-  sameAs: z.string().url().optional(),
+  url: z.url().optional(),
+  sameAs: z.url().optional(),
 });
 
 export type JobPosting = z.infer<typeof JobPostingSchema>;

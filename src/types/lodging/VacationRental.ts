@@ -28,7 +28,9 @@ export type BedDetails = z.infer<typeof BedDetailsSchema>;
 // ─── LocationFeatureSpecification ────────────────────────────────────────────
 
 const LocationFeatureSpecificationSchema = z.object({
-  "@type": z.literal("LocationFeatureSpecification").default("LocationFeatureSpecification"),
+  "@type": z
+    .literal("LocationFeatureSpecification")
+    .default("LocationFeatureSpecification"),
   name: z.string(),
   value: z.union([z.boolean(), z.string(), z.number()]).optional(),
 });
@@ -44,28 +46,34 @@ const LocationFeatureSpecificationSchema = z.object({
 export const AccommodationSchema = z.object({
   "@type": z.literal("Accommodation").default("Accommodation"),
   name: z.string().optional(),
-  occupancy: z.object({
-    "@type": z.literal("QuantitativeValue").default("QuantitativeValue"),
-    value: z.number().int().positive().optional(),
-    maxValue: z.number().int().positive().optional(),
-    minValue: z.number().int().positive().optional(),
-  }).optional(),
+  occupancy: z
+    .object({
+      "@type": z.literal("QuantitativeValue").default("QuantitativeValue"),
+      value: z.number().int().positive().optional(),
+      maxValue: z.number().int().positive().optional(),
+      minValue: z.number().int().positive().optional(),
+    })
+    .optional(),
   numberOfRooms: z.number().int().nonnegative().optional(),
   numberOfBedrooms: z.number().int().nonnegative().optional(),
   numberOfBathroomsTotal: z.number().int().nonnegative().optional(),
-  floorSize: z.object({
-    "@type": z.literal("QuantitativeValue").default("QuantitativeValue"),
-    value: z.number(),
-    /** "MTK" = sq metres, "FTK" = sq ft */
-    unitCode: z.string().optional(),
-  }).optional(),
+  floorSize: z
+    .object({
+      "@type": z.literal("QuantitativeValue").default("QuantitativeValue"),
+      value: z.number(),
+      /** "MTK" = sq metres, "FTK" = sq ft */
+      unitCode: z.string().optional(),
+    })
+    .optional(),
   bed: z.union([BedDetailsSchema, z.array(BedDetailsSchema)]).optional(),
-  amenityFeature: z.union([
-    LocationFeatureSpecificationSchema,
-    z.array(LocationFeatureSpecificationSchema),
-  ]).optional(),
+  amenityFeature: z
+    .union([
+      LocationFeatureSpecificationSchema,
+      z.array(LocationFeatureSpecificationSchema),
+    ])
+    .optional(),
   petsAllowed: z.union([z.boolean(), z.string()]).optional(),
-  url: z.string().url().optional(),
+  url: z.url().optional(),
   /** "EntirePlace", "PrivateRoom", or "SharedRoom" */
   additionalType: z.string().optional(),
 });
@@ -86,40 +94,55 @@ export const VacationRentalSchema = LocalBusinessSchema.extend({
   image: z.union([ImageOrUrl, z.array(ImageOrUrl)]).optional(),
   // Lodging-specific:
   petsAllowed: z.union([z.boolean(), z.string()]).optional(),
-  checkinTime: z.string().optional(),            // e.g. "15:00"
-  checkoutTime: z.string().optional(),           // e.g. "11:00"
-  numberOfRooms: z.union([
-    z.number(),
-    z.object({
+  checkinTime: z.string().optional(), // e.g. "15:00"
+  checkoutTime: z.string().optional(), // e.g. "11:00"
+  numberOfRooms: z
+    .union([
+      z.number(),
+      z.object({
+        "@type": z.literal("QuantitativeValue").default("QuantitativeValue"),
+        value: z.number(),
+      }),
+    ])
+    .optional(),
+  occupancy: z
+    .object({
+      "@type": z.literal("QuantitativeValue").default("QuantitativeValue"),
+      maxValue: z.number(),
+      minValue: z.number().optional(),
+    })
+    .optional(),
+  starRating: z
+    .object({
+      "@type": z.literal("Rating").default("Rating"),
+      ratingValue: z.number().min(0).max(5),
+    })
+    .optional(),
+  offers: z.union([OfferSchema, z.array(OfferSchema)]).optional(),
+  leaseLength: z
+    .union([
+      z.string(),
+      z.object({
+        "@type": z.literal("QuantitativeValue").default("QuantitativeValue"),
+        value: z.number(),
+        unitCode: z.string().optional(),
+      }),
+    ])
+    .optional(),
+  floorSize: z
+    .object({
       "@type": z.literal("QuantitativeValue").default("QuantitativeValue"),
       value: z.number(),
-    }),
-  ]).optional(),
-  occupancy: z.object({
-    "@type": z.literal("QuantitativeValue").default("QuantitativeValue"),
-    maxValue: z.number(),
-    minValue: z.number().optional(),
-  }).optional(),
-  starRating: z.object({
-    "@type": z.literal("Rating").default("Rating"),
-    ratingValue: z.number().min(0).max(5),
-  }).optional(),
-  offers: z.union([OfferSchema, z.array(OfferSchema)]).optional(),
-  leaseLength: z.union([z.string(), z.object({
-    "@type": z.literal("QuantitativeValue").default("QuantitativeValue"),
-    value: z.number(),
-    unitCode: z.string().optional(),
-  })]).optional(),
-  floorSize: z.object({
-    "@type": z.literal("QuantitativeValue").default("QuantitativeValue"),
-    value: z.number(),
-    unitCode: z.string().optional(),             // e.g. "MTK" (square meters), "FTK" (sq ft)
-  }).optional(),
+      unitCode: z.string().optional(), // e.g. "MTK" (square meters), "FTK" (sq ft)
+    })
+    .optional(),
   numberOfBathroomsTotal: z.number().int().nonnegative().optional(),
   numberOfBedrooms: z.number().int().nonnegative().optional(),
-  tourBookingPage: z.string().url().optional(),
+  tourBookingPage: z.url().optional(),
   /** Accommodation unit(s) within the rental property — required by Google */
-  containsPlace: z.union([AccommodationSchema, z.array(AccommodationSchema)]).optional(),
+  containsPlace: z
+    .union([AccommodationSchema, z.array(AccommodationSchema)])
+    .optional(),
   brand: z
     .union([
       z.string(),

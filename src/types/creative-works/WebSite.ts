@@ -14,7 +14,7 @@ import { PersonOrOrgRef } from "../shared/PersonOrOrgRef";
  */
 export const WebSiteSchema = CreativeWorkSchema.extend({
   "@type": z.literal("WebSite").default("WebSite"),
-  url: z.string().url().optional(),
+  url: z.url().optional(),
   name: z.string().optional(),
   /**
    * Sitelinks Searchbox via SearchAction.
@@ -23,17 +23,19 @@ export const WebSiteSchema = CreativeWorkSchema.extend({
    * longer displays a search box in branded search results.
    * See: https://developers.google.com/search/blog/2024/11/retiring-sitelinks-searchbox
    */
-  potentialAction: z.object({
-    "@type": z.literal("SearchAction"),
-    target: z.union([
-      z.string(),
-      z.object({
-        "@type": z.literal("EntryPoint"),
-        urlTemplate: z.string(),
-      }),
-    ]),
-    "query-input": z.string().optional(),
-  }).optional(),
+  potentialAction: z
+    .object({
+      "@type": z.literal("SearchAction"),
+      target: z.union([
+        z.string(),
+        z.object({
+          "@type": z.literal("EntryPoint"),
+          urlTemplate: z.string(),
+        }),
+      ]),
+      "query-input": z.string().optional(),
+    })
+    .optional(),
   // Content language(s)
   inLanguage: z.union([z.string(), z.array(z.string())]).optional(),
   // Authorship / ownership
@@ -41,9 +43,9 @@ export const WebSiteSchema = CreativeWorkSchema.extend({
   // Site-level metadata
   copyrightYear: z.number().int().optional(),
   // isPartOf — rarely used for WebSite itself but allowed
-  isPartOf: z.lazy(() =>
-    z.object({ "@type": z.string() }).catchall(z.unknown())
-  ).optional(),
+  isPartOf: z
+    .lazy(() => z.object({ "@type": z.string() }).catchall(z.unknown()))
+    .optional(),
 });
 
 export type WebSite = z.infer<typeof WebSiteSchema>;

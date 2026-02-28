@@ -11,7 +11,9 @@ import { ShippingServiceSchema } from "../shared/ShippingService";
 
 // Loose reference for nested org references (avoids circular type inference)
 const NestedOrgRef = z.lazy(() =>
-  z.object({ "@type": z.string(), name: z.string().optional() }).catchall(z.unknown())
+  z
+    .object({ "@type": z.string(), name: z.string().optional() })
+    .catchall(z.unknown()),
 );
 
 export const OrganizationSchema = extendThing("Organization", {
@@ -19,21 +21,25 @@ export const OrganizationSchema = extendThing("Organization", {
   email: z.string().email().optional(),
   telephone: z.string().optional(),
   logo: ImageOrUrl.optional(),
-  foundingDate: z.string().optional(),           // ISO 8601 date
-  numberOfEmployees: z.object({
-    "@type": z.literal("QuantitativeValue").default("QuantitativeValue"),
-    value: z.number(),
-  }).optional(),
+  foundingDate: z.string().optional(), // ISO 8601 date
+  numberOfEmployees: z
+    .object({
+      "@type": z.literal("QuantitativeValue").default("QuantitativeValue"),
+      value: z.number(),
+    })
+    .optional(),
   address: z.union([z.string(), PostalAddressSchema]).optional(),
-  contactPoint: z.union([ContactPointSchema, z.array(ContactPointSchema)]).optional(),
+  contactPoint: z
+    .union([ContactPointSchema, z.array(ContactPointSchema)])
+    .optional(),
   // Google Organization requirements:
   vatID: z.string().optional(),
-  iso6523Code: z.string().optional(),            // e.g. "0060:123456789" (DUNS)
+  iso6523Code: z.string().optional(), // e.g. "0060:123456789" (DUNS)
   taxID: z.string().optional(),
   leiCode: z.string().optional(),
   duns: z.string().optional(),
-  globalLocationNumber: z.string().optional(),   // GS1 GLN
-  naics: z.string().optional(),                  // NAICS industry code
+  globalLocationNumber: z.string().optional(), // GS1 GLN
+  naics: z.string().optional(), // NAICS industry code
   // Merchant-related (Google seller identity signals):
   hasMerchantReturnPolicy: MerchantReturnPolicySchema.optional(),
   hasShippingService: z
@@ -53,7 +59,7 @@ export const OrganizationSchema = extendThing("Organization", {
   // Hierarchical organization (loose refs to avoid circular type inference):
   subOrganization: NestedOrgRef.optional(),
   parentOrganization: NestedOrgRef.optional(),
-  sameAs: z.union([z.string().url(), z.array(z.string().url())]).optional(),
+  sameAs: z.union([z.url(), z.array(z.url())]).optional(),
 });
 
 export type Organization = z.infer<typeof OrganizationSchema>;
@@ -61,11 +67,13 @@ export type Organization = z.infer<typeof OrganizationSchema>;
 export const createOrganization = makeFactory(OrganizationSchema);
 
 export const createNGO = makeFactory(
-  OrganizationSchema.extend({ "@type": z.literal("NGO").default("NGO") })
+  OrganizationSchema.extend({ "@type": z.literal("NGO").default("NGO") }),
 );
 
 export const createCorporation = makeFactory(
-  OrganizationSchema.extend({ "@type": z.literal("Corporation").default("Corporation") })
+  OrganizationSchema.extend({
+    "@type": z.literal("Corporation").default("Corporation"),
+  }),
 );
 
 /**
@@ -73,7 +81,9 @@ export const createCorporation = makeFactory(
  * Google uses this for the Organization knowledge panel for online retailers.
  */
 export const createOnlineStore = makeFactory(
-  OrganizationSchema.extend({ "@type": z.literal("OnlineStore").default("OnlineStore") })
+  OrganizationSchema.extend({
+    "@type": z.literal("OnlineStore").default("OnlineStore"),
+  }),
 );
 
 /**
@@ -81,5 +91,7 @@ export const createOnlineStore = makeFactory(
  * Use for SaaS companies, marketplaces, and other digital-first businesses.
  */
 export const createOnlineBusiness = makeFactory(
-  OrganizationSchema.extend({ "@type": z.literal("OnlineBusiness").default("OnlineBusiness") })
+  OrganizationSchema.extend({
+    "@type": z.literal("OnlineBusiness").default("OnlineBusiness"),
+  }),
 );

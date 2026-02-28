@@ -39,12 +39,14 @@ export const ApplicationCategory = z.enum([
  * Google recommended: applicationCategory, operatingSystem
  */
 export const SoftwareApplicationSchema = CreativeWorkSchema.extend({
-  "@type": z.union([
-    z.literal("SoftwareApplication"),
-    z.literal("MobileApplication"),
-    z.literal("WebApplication"),
-    z.literal("VideoGame"),
-  ]).default("SoftwareApplication"),
+  "@type": z
+    .union([
+      z.literal("SoftwareApplication"),
+      z.literal("MobileApplication"),
+      z.literal("WebApplication"),
+      z.literal("VideoGame"),
+    ])
+    .default("SoftwareApplication"),
   // Required by Google:
   name: z.string(),
   // Recommended by Google:
@@ -56,10 +58,10 @@ export const SoftwareApplicationSchema = CreativeWorkSchema.extend({
   // Optional:
   softwareVersion: z.string().optional(),
   fileSize: z.string().optional(),
-  downloadUrl: z.string().url().optional(),
+  downloadUrl: z.url().optional(),
   screenshot: z.union([ImageOrUrl, z.array(ImageOrUrl)]).optional(),
   featureList: z.union([z.string(), z.array(z.string())]).optional(),
-  installUrl: z.string().url().optional(),
+  installUrl: z.url().optional(),
   softwareRequirements: z.string().optional(),
   permissions: z.string().optional(),
   // WebApplication specific:
@@ -81,11 +83,11 @@ export const createSoftwareApplication = makeFactory(SoftwareApplicationSchema);
 export const createMobileApplication = makeFactory(
   SoftwareApplicationSchema.extend({
     "@type": z.literal("MobileApplication").default("MobileApplication"),
-  })
+  }),
 );
 
 export const createWebApplication = makeFactory(
   SoftwareApplicationSchema.extend({
     "@type": z.literal("WebApplication").default("WebApplication"),
-  })
+  }),
 );

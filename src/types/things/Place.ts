@@ -14,29 +14,43 @@ import { ImageOrUrl } from "../shared/ImageObject";
 export const PlaceSchema = extendThing("Place", {
   address: z.union([z.string(), PostalAddressSchema]).optional(),
   geo: GeoCoordinatesSchema.optional(),
-  hasMap: z.string().url().optional(),
+  hasMap: z.url().optional(),
   photo: z.union([ImageOrUrl, z.array(ImageOrUrl)]).optional(),
   telephone: z.string().optional(),
   faxNumber: z.string().optional(),
-  openingHoursSpecification: z.union([
-    OpeningHoursSpecificationSchema,
-    z.array(OpeningHoursSpecificationSchema),
-  ]).optional(),
-  specialOpeningHoursSpecification: z.union([
-    OpeningHoursSpecificationSchema,
-    z.array(OpeningHoursSpecificationSchema),
-  ]).optional(),
+  openingHoursSpecification: z
+    .union([
+      OpeningHoursSpecificationSchema,
+      z.array(OpeningHoursSpecificationSchema),
+    ])
+    .optional(),
+  specialOpeningHoursSpecification: z
+    .union([
+      OpeningHoursSpecificationSchema,
+      z.array(OpeningHoursSpecificationSchema),
+    ])
+    .optional(),
   maximumAttendeeCapacity: z.number().int().nonnegative().optional(),
   isAccessibleForFree: z.boolean().optional(),
   publicAccess: z.boolean().optional(),
-  amenityFeature: z.array(z.object({
-    "@type": z.literal("LocationFeatureSpecification").default("LocationFeatureSpecification"),
-    name: z.string(),
-    value: z.union([z.boolean(), z.string(), z.number()]),
-  })).optional(),
-  containedInPlace: z.lazy(() =>
-    z.object({ "@type": z.string(), name: z.string().optional() }).catchall(z.unknown())
-  ).optional(),
+  amenityFeature: z
+    .array(
+      z.object({
+        "@type": z
+          .literal("LocationFeatureSpecification")
+          .default("LocationFeatureSpecification"),
+        name: z.string(),
+        value: z.union([z.boolean(), z.string(), z.number()]),
+      }),
+    )
+    .optional(),
+  containedInPlace: z
+    .lazy(() =>
+      z
+        .object({ "@type": z.string(), name: z.string().optional() })
+        .catchall(z.unknown()),
+    )
+    .optional(),
 });
 
 export type Place = z.infer<typeof PlaceSchema>;

@@ -27,7 +27,11 @@ Requires **Node.js ≥ 18** and **Zod ≥ 4.3**.
 ## Quick Start
 
 ```typescript
-import { createProduct, createOffer, createBreadcrumbList } from "schemaorg-kit";
+import {
+  createProduct,
+  createOffer,
+  createBreadcrumbList,
+} from "schemaorg-kit";
 
 const product = createProduct({
   name: "Running Shoes",
@@ -50,14 +54,14 @@ const jsonLd = product.toJsonLd(); // includes @context
 
 Every node returned by a factory exposes these methods:
 
-| Method | Returns | Description |
-|--------|---------|-------------|
-| `.toObject()` | `T` | Raw validated object — use this when nesting inside another schema |
-| `.toJsonLd()` | `Record<string, unknown>` | Object with `@context: "https://schema.org"` added |
-| `.toScript()` | `string` | Full `<script type="application/ld+json">` tag, ready for HTML |
-| `.toString()` | `string` | Pretty-printed JSON string |
-| `.validate()` | `this` | Throws a `ZodError` if data is invalid (chainable) |
-| `.safeParse()` | Zod result | Returns `{ success, data, error }` without throwing |
+| Method         | Returns                   | Description                                                        |
+| -------------- | ------------------------- | ------------------------------------------------------------------ |
+| `.toObject()`  | `T`                       | Raw validated object — use this when nesting inside another schema |
+| `.toJsonLd()`  | `Record<string, unknown>` | Object with `@context: "https://schema.org"` added                 |
+| `.toScript()`  | `string`                  | Full `<script type="application/ld+json">` tag, ready for HTML     |
+| `.toString()`  | `string`                  | Pretty-printed JSON string                                         |
+| `.validate()`  | `this`                    | Throws a `ZodError` if data is invalid (chainable)                 |
+| `.safeParse()` | Zod result                | Returns `{ success, data, error }` without throwing                |
 
 ## Composing Schemas
 
@@ -70,7 +74,7 @@ const author = createPerson({ name: "Jane Doe", url: "https://janedoe.com" });
 
 const article = createArticle({
   headline: "Hello World",
-  author: author.toObject(),       // <-- nest with .toObject()
+  author: author.toObject(), // <-- nest with .toObject()
   publisher: createOrganization({
     name: "Acme Blog",
     url: "https://acmeblog.com",
@@ -86,10 +90,18 @@ console.log(article.toScript());
 Use `createGraph` to output multiple schema nodes in a single `<script>` tag with `@id` cross-references:
 
 ```typescript
-import { createGraph, createWebPage, createArticle, createPerson } from "schemaorg-kit";
+import {
+  createGraph,
+  createWebPage,
+  createArticle,
+  createPerson,
+} from "schemaorg-kit";
 
 const graph = createGraph([
-  createWebPage({ "@id": "https://example.com/post#webpage", url: "https://example.com/post" }),
+  createWebPage({
+    "@id": "https://example.com/post#webpage",
+    url: "https://example.com/post",
+  }),
   createArticle({
     "@id": "https://example.com/post#article",
     headline: "Hello World",
@@ -110,70 +122,70 @@ As an alternative to named imports, use the `schema()` factory with any register
 import { schema } from "schemaorg-kit";
 
 const product = schema("Product", { name: "Shoes", sku: "SH-001" });
-const event   = schema("Event",   { name: "Conference", startDate: "2025-09-01" });
+const event = schema("Event", { name: "Conference", startDate: "2025-09-01" });
 ```
 
 ## Supported Types
 
 ### Things
 
-| Factory | Schema.org Type |
-|---------|----------------|
-| `createPerson` | `Person` |
-| `createOrganization` | `Organization` |
-| `createCorporation` | `Corporation` |
-| `createNGO` | `NGO` |
-| `createOnlineStore` | `OnlineStore` |
+| Factory                | Schema.org Type  |
+| ---------------------- | ---------------- |
+| `createPerson`         | `Person`         |
+| `createOrganization`   | `Organization`   |
+| `createCorporation`    | `Corporation`    |
+| `createNGO`            | `NGO`            |
+| `createOnlineStore`    | `OnlineStore`    |
 | `createOnlineBusiness` | `OnlineBusiness` |
-| `createProduct` | `Product` |
-| `createProductGroup` | `ProductGroup` |
-| `createEvent` | `Event` |
-| `createPlace` | `Place` |
-| `createLocalBusiness` | `LocalBusiness` |
-| `createRestaurant` | `Restaurant` |
-| `createHotel` | `Hotel` |
-| `createMovie` | `Movie` |
+| `createProduct`        | `Product`        |
+| `createProductGroup`   | `ProductGroup`   |
+| `createEvent`          | `Event`          |
+| `createPlace`          | `Place`          |
+| `createLocalBusiness`  | `LocalBusiness`  |
+| `createRestaurant`     | `Restaurant`     |
+| `createHotel`          | `Hotel`          |
+| `createMovie`          | `Movie`          |
 
 ### Creative Works
 
-| Factory | Schema.org Type |
-|---------|----------------|
-| `createBook` | `Book` (with ReadAction / BorrowAction) |
-| `createArticle` | `Article` |
-| `createNewsArticle` | `NewsArticle` |
-| `createBlogPosting` | `BlogPosting` |
-| `createWebPage` | `WebPage` |
-| `createWebSite` | `WebSite` |
-| `createDataset` | `Dataset` |
-| `createRecipe` | `Recipe` |
-| `createCourse` | `Course` |
-| `createSoftwareApplication` | `SoftwareApplication` |
-| `createMobileApplication` | `MobileApplication` |
-| `createWebApplication` | `WebApplication` |
-| `createMathSolver` | `MathSolver` |
-| `createClaimReview` | `ClaimReview` (Fact Check) |
+| Factory                     | Schema.org Type                         |
+| --------------------------- | --------------------------------------- |
+| `createBook`                | `Book` (with ReadAction / BorrowAction) |
+| `createArticle`             | `Article`                               |
+| `createNewsArticle`         | `NewsArticle`                           |
+| `createBlogPosting`         | `BlogPosting`                           |
+| `createWebPage`             | `WebPage`                               |
+| `createWebSite`             | `WebSite`                               |
+| `createDataset`             | `Dataset`                               |
+| `createRecipe`              | `Recipe`                                |
+| `createCourse`              | `Course`                                |
+| `createSoftwareApplication` | `SoftwareApplication`                   |
+| `createMobileApplication`   | `MobileApplication`                     |
+| `createWebApplication`      | `WebApplication`                        |
+| `createMathSolver`          | `MathSolver`                            |
+| `createClaimReview`         | `ClaimReview` (Fact Check)              |
 
 ### Intangibles & Other
 
-| Factory | Schema.org Type |
-|---------|----------------|
-| `createOffer` | `Offer` |
-| `createImageObject` | `ImageObject` |
-| `createVideoObject` | `VideoObject` |
-| `createJobPosting` | `JobPosting` |
+| Factory                                          | Schema.org Type                |
+| ------------------------------------------------ | ------------------------------ |
+| `createOffer`                                    | `Offer`                        |
+| `createImageObject`                              | `ImageObject`                  |
+| `createVideoObject`                              | `VideoObject`                  |
+| `createJobPosting`                               | `JobPosting`                   |
 | `createQAPage` / `createQuiz` / `createQuestion` | `QAPage` / `Quiz` / `Question` |
-| `createDiscussionForumPosting` | `DiscussionForumPosting` |
-| `createProfilePage` | `ProfilePage` |
-| `createVacationRental` | `VacationRental` |
-| `createLanguage` | `Language` |
+| `createDiscussionForumPosting`                   | `DiscussionForumPosting`       |
+| `createProfilePage`                              | `ProfilePage`                  |
+| `createVacationRental`                           | `VacationRental`               |
+| `createLanguage`                                 | `Language`                     |
 
 ### Helpers
 
-| Helper | What it does |
-|--------|-------------|
-| `createBreadcrumbList([...])` | Builds a `BreadcrumbList` from a plain array |
-| `createFAQPage([...])` | Builds a `FAQPage` from `{question, answer}` pairs |
-| `createCarousel([...])` | Wraps schema nodes in an `ItemList` carousel |
+| Helper                        | What it does                                                 |
+| ----------------------------- | ------------------------------------------------------------ |
+| `createBreadcrumbList([...])` | Builds a `BreadcrumbList` from a plain array                 |
+| `createFAQPage([...])`        | Builds a `FAQPage` from `{question, answer}` pairs           |
+| `createCarousel([...])`       | Wraps schema nodes in an `ItemList` carousel                 |
 | `createPaywalledArticle(...)` | Article with `isAccessibleForFree: false` paywalled sections |
 
 ## Common Patterns
@@ -201,7 +213,9 @@ const product = createProduct({
       availability: "InStock",
       shippingDetails: OfferShippingDetailsSchema.parse({
         shippingRate: { value: 0, currency: "USD" },
-        shippingDestination: DefinedRegionSchema.parse({ addressCountry: "US" }),
+        shippingDestination: DefinedRegionSchema.parse({
+          addressCountry: "US",
+        }),
         deliveryTime: {
           handlingTime: { minValue: 0, maxValue: 1, unitCode: "DAY" },
           transitTime: { minValue: 3, maxValue: 5, unitCode: "DAY" },
@@ -218,8 +232,11 @@ const product = createProduct({
 import { createFAQPage } from "schemaorg-kit";
 
 const faq = createFAQPage([
-  { question: "What is schemaorg-kit?", answer: "A type-safe schema.org builder." },
-  { question: "Does it support @graph?",  answer: "Yes, via createGraph()." },
+  {
+    question: "What is schemaorg-kit?",
+    answer: "A type-safe schema.org builder.",
+  },
+  { question: "Does it support @graph?", answer: "Yes, via createGraph()." },
 ]);
 
 document.head.innerHTML += faq.toScript();
@@ -231,9 +248,9 @@ document.head.innerHTML += faq.toScript();
 import { createBreadcrumbList } from "schemaorg-kit";
 
 const breadcrumb = createBreadcrumbList([
-  { name: "Home",     url: "https://example.com" },
+  { name: "Home", url: "https://example.com" },
   { name: "Products", url: "https://example.com/products" },
-  { name: "Shoes" },   // last item — url is optional
+  { name: "Shoes" }, // last item — url is optional
 ]);
 ```
 
@@ -244,7 +261,7 @@ import { extendThing, makeFactory } from "schemaorg-kit";
 import { z } from "zod";
 
 const PodcastSchema = extendThing("PodcastSeries", {
-  webFeed: z.string().url(),
+  webFeed: z.url(),
   numberOfEpisodes: z.number().int().optional(),
 });
 

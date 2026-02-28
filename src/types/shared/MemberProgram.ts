@@ -14,7 +14,7 @@ export const MemberProgramTierSchema = z.object({
       unitText: z.string().optional(),
     })
     .optional(),
-  url: z.string().url().optional(),
+  url: z.url().optional(),
 });
 
 export type MemberProgramTier = z.infer<typeof MemberProgramTierSchema>;
@@ -26,7 +26,7 @@ export const MemberProgramSchema = z.object({
   hasTiers: z
     .union([MemberProgramTierSchema, z.array(MemberProgramTierSchema)])
     .optional(),
-  url: z.string().url().optional(),
+  url: z.url().optional(),
 });
 
 export type MemberProgram = z.infer<typeof MemberProgramSchema>;
